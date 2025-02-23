@@ -1,5 +1,9 @@
 {
-  "folders": [{ "path": "." }, { "path": "importer" }],
+  "folders": [
+    { "path": "." },
+    { "path": "importer" },
+    { "path": "infrastructure" }
+  ],
   "settings": {
     "cSpell.language": "en,de-de",
 

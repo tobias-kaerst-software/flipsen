@@ -58,9 +58,13 @@ export const generateMovieEmbedding = async (movie: MovieDetails) => {
 
   const embedding = EmbeddingResponseSchema.safeParse(res);
 
+  console.log(embedding);
+
   if (!embedding.success) {
     return logger.error('COULD_NOT_CREATE_MOVIE_EMBEDDING', embedding.error, { id: movie.id, movieInput });
   }
 
   return embedding.data.data[0].embedding;
 };
+
+// 330 tokens
