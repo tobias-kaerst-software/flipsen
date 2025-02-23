@@ -18,7 +18,7 @@ resource "mongodbatlas_flex_cluster" "cluster" {
   name = "${var.environment}-cluster"
 
   provider_settings = {
-    backing_provider_name = local.mongo_cluster_provider
-    region_name           = local.mongo_cluster_location
+    backing_provider_name = "AWS"
+    region_name           = "EU_CENTRAL_1"
   }
 }

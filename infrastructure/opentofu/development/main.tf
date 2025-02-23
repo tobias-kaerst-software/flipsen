@@ -14,6 +14,11 @@ terraform {
       source  = "mongodb/mongodbatlas"
       version = "1.27.0"
     }
+
+    upstash = {
+      source  = "upstash/upstash"
+      version = "1.5.3"
+    }
   }
 
   encryption {
@@ -61,22 +66,19 @@ data "infisical_secrets" "env" {
 locals {
   project_name = nonsensitive(data.infisical_secrets.env.secrets["PROJECT_NAME"].value)
 
-  azure_resource_location = nonsensitive(data.infisical_secrets.env.secrets["AZURE_RESOURCE_LOCATION"].value)
-  azure_webapp_location   = nonsensitive(data.infisical_secrets.env.secrets["AZURE_WEBAPP_LOCATION"].value)
-
   azure_subscription_id             = nonsensitive(data.infisical_secrets.env.secrets["AZURE_SUBSCRIPTION_ID"].value)
   azure_client_id                   = nonsensitive(data.infisical_secrets.env.secrets["AZURE_CLIENT_ID"].value)
   azure_client_certificate_password = data.infisical_secrets.env.secrets["AZURE_CERTIFICATE_PASSWORD"].value
   azure_client_certificate          = data.infisical_secrets.env.secrets["AZURE_CERTIFICATE"].value
   azure_tenant_id                   = nonsensitive(data.infisical_secrets.env.secrets["AZURE_TENANT_ID"].value)
 
-  mongo_org_id      = nonsensitive(data.infisical_secrets.env.secrets["MONGO_ORG_ID"].value)
-  mongo_public_key  = data.infisical_secrets.env.secrets["MONGO_PUBLIC_KEY"].value
-  mongo_private_key = data.infisical_secrets.env.secrets["MONGO_PRIVATE_KEY"].value
-
-  mongo_cluster_location  = nonsensitive(data.infisical_secrets.env.secrets["MONGO_CLUSTER_LOCATION"].value)
-  mongo_cluster_provider  = nonsensitive(data.infisical_secrets.env.secrets["MONGO_CLUSTER_PROVIDER"].value)
+  mongo_org_id            = nonsensitive(data.infisical_secrets.env.secrets["MONGO_ORG_ID"].value)
+  mongo_public_key        = data.infisical_secrets.env.secrets["MONGO_PUBLIC_KEY"].value
+  mongo_private_key       = data.infisical_secrets.env.secrets["MONGO_PRIVATE_KEY"].value
   mongo_project_whitelist = nonsensitive(data.infisical_secrets.env.secrets["MONGO_PROJECT_WHITELIST"].value)
+
+  upstash_email   = nonsensitive(data.infisical_secrets.env.secrets["UPSTASH_EMAIL"].value)
+  upstash_api_key = data.infisical_secrets.env.secrets["UPSTASH_API_KEY"].value
 }
 
 provider "azurerm" {
@@ -91,4 +93,9 @@ provider "azurerm" {
 provider "mongodbatlas" {
   public_key  = local.mongo_public_key
   private_key = local.mongo_private_key
+}
+
+provider "upstash" {
+  email   = local.upstash_email
+  api_key = local.upstash_api_key
 }
