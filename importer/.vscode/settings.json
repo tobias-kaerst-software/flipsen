@@ -1,0 +1,20 @@
+{
+  "explorer.fileNesting.patterns": {
+    "package.json": ".gitignore,tsconfig.json,eslint.config.ts,.infisical.json"
+  },
+  "files.exclude": {
+    "**/bun.lockb": true,
+    "**/node_modules": true
+  },
+
+  "eslint.workingDirectories": ["tmdb-importer"],
+
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+
+  "[json][jsonc][html][javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+  }
+}
