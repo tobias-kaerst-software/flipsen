@@ -1,7 +1,6 @@
 {
   "explorer.fileNesting.patterns": {
-    "vars.tf": "terraform.tfvars,.infisical.json",
-    "main.tf": ".terraform.lock.hcl",
+    "vars.tf": "terraform.tfvars,.infisical.json,.terraform.lock.hcl",
     "Taskfile.yml": ".gitignore"
   },
   "files.exclude": {
