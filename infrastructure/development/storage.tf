@@ -1,0 +1,17 @@
+resource "azurerm_storage_account" "storage_account" {
+  name = "${local.project_name}${var.environment}st0"
+
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  access_tier              = "Hot"
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_container" "terraform_state" {
+  storage_account_id = azurerm_storage_account.storage_account.id
+
+  name                  = "tfstate"
+  container_access_type = "private"
+}

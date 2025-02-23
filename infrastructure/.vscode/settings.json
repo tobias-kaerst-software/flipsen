@@ -1,0 +1,17 @@
+{
+  "explorer.fileNesting.patterns": {
+    "vars.tf": "terraform.tfvars,.infisical.json",
+    "main.tf": ".terraform.lock.hcl",
+    "Taskfile.yml": ".gitignore"
+  },
+  "files.exclude": {
+    "**/.terraform": true
+  },
+
+  "[json][jsonc][html][javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[terraform]": {
+    "editor.defaultFormatter": "gamunu.opentofu"
+  }
+}

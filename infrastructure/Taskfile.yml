@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  development:
+    dir: 'development'
+    cmds:
+      - infisical run --path="/terraform" -- {{.CLI_ARGS}}
