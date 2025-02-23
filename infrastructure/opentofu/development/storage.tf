@@ -15,3 +15,10 @@ resource "azurerm_storage_container" "terraform_state" {
   name                  = "tfstate"
   container_access_type = "private"
 }
+
+resource "azurerm_storage_container" "movies" {
+  storage_account_id = azurerm_storage_account.storage_account.id
+
+  name                  = "movies"
+  container_access_type = "blob"
+}

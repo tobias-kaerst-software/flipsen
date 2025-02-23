@@ -54,8 +54,9 @@ data "infisical_secrets" "env" {
 }
 
 locals {
-  project_name = nonsensitive(data.infisical_secrets.env.secrets["PROJECT_NAME"].value)
-  location     = nonsensitive(data.infisical_secrets.env.secrets["LOCATION"].value)
+  project_name    = nonsensitive(data.infisical_secrets.env.secrets["PROJECT_NAME"].value)
+  location        = nonsensitive(data.infisical_secrets.env.secrets["LOCATION"].value)
+  webapp_location = nonsensitive(data.infisical_secrets.env.secrets["WEBAPP_LOCATION"].value)
 
   azure_subscription_id             = nonsensitive(data.infisical_secrets.env.secrets["AZURE_SUBSCRIPTION_ID"].value)
   azure_client_id                   = nonsensitive(data.infisical_secrets.env.secrets["AZURE_CLIENT_ID"].value)
