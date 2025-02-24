@@ -1,13 +1,6 @@
 import type { ReactNode } from 'react';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import type { Theme } from '$/components/common/theme/ThemeScript';
 
@@ -19,17 +12,11 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setTheme] = useState(
-    typeof window === 'undefined' ? 'light' : window.theme || 'light',
-  );
+  const [theme, setTheme] = useState(typeof window === 'undefined' ? 'light' : window.theme || 'light');
 
   const toggleTheme = useCallback(() => {
     window.document.documentElement.classList.add('disable-transitions');
-    setTimeout(
-      () =>
-        window.document.documentElement.classList.remove('disable-transitions'),
-      200,
-    );
+    setTimeout(() => window.document.documentElement.classList.remove('disable-transitions'), 200);
     const newTheme = theme === 'light' ? 'dark' : 'light';
     window.setPreferredTheme(newTheme);
     setTheme(newTheme);
@@ -45,9 +32,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
-  return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
 
 export const useTheme = () => {
