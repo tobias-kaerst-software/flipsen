@@ -2,7 +2,9 @@
   "folders": [
     { "path": "." },
     { "path": "importer" },
-    { "path": "infrastructure" }
+    { "path": "infrastructure" },
+    { "path": "frontend" },
+    { "path": "backend" }
   ],
   "settings": {
     "cSpell.language": "en,de-de",

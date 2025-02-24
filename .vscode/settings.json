@@ -1,6 +1,8 @@
 {
-    "files.exclude": {
-      "**/backend": true,
-      "**/frontend": true
-    }
+  "files.exclude": {
+    "**/backend": true,
+    "**/frontend": true,
+    "**/importer": true,
+    "**/infrastructure": true
   }
+}

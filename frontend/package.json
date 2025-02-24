@@ -1,0 +1,11 @@
+{
+  "name": "frontend",
+  "workspaces": [
+    "application",
+    "modules/*"
+  ],
+  "scripts": {
+    "frontend": "bun --filter 'frontend'",
+    "deps": "bunx npm-check-updates --workspaces --root -u"
+  }
+}
