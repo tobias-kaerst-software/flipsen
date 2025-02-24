@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   changes:
-    name: Determine
+    name: Determine Jobs
     runs-on: ubuntu-latest
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
@@ -31,7 +31,7 @@ jobs:
               - 'backend/**'
 
   frontend:
-    name: Lint, build and deploy frontend
+    name: Frontend CD
     runs-on: ubuntu-latest
 
     needs: [changes]
@@ -80,7 +80,7 @@ jobs:
           skip_app_build: true
 
   backend:
-    name: Lint, build and deploy backend
+    name: Backend CD
     runs-on: ubuntu-latest
 
     needs: [changes]
@@ -120,4 +120,4 @@ jobs:
         with:
           context: backend
           push: true
-          tags: tobias-kaerst-software/flipsen:latest
+          tags: ghcr.io/tobias-kaerst-software/flipsen:latest
