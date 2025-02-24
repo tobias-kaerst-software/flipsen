@@ -42,8 +42,8 @@ terraform {
   }
 
   backend "azurerm" {
-    storage_account_name = "flipsendevst0"
-    container_name       = "tfstate"
+    storage_account_name = "tksoftwaretfstates"
+    container_name       = "flipsen"
     key                  = "dev.terraform.tfstate"
   }
 }
