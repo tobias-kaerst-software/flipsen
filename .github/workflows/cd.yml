@@ -120,3 +120,4 @@ jobs:
         with:
           push: true
           tags: tobias-kaerst-software/flipsen:latest
+        working-directory: backend
