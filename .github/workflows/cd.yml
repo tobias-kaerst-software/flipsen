@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
-      infrastructure: ${{ steps.filter.outputs.infrastructure }}
+      backend: ${{ steps.filter.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
 
@@ -26,44 +26,15 @@ jobs:
             frontend:
               - '.github/workflows/cd.yml'
               - 'frontend/**'
-            infrastructure:
+            backend:
               - '.github/workflows/cd.yml'
-              - 'infrastructure/opentofu/**'
-
-  infrastructure:
-    name: Apply OpenTofu infrastructure
-    runs-on: ubuntu-latest
-
-    needs: [changes]
-    if: ${{ needs.changes.outputs.infrastructure == 'true' }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - uses: Infisical/secrets-action@v1.0.8
-        with:
-          client-id: ${{ vars.INFISICAL_CLIENT_ID }}
-          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-slug: '${{ vars.INFISICAL_PROJECT_SLUG }}'
-          env-slug: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
-          secret-path: '/terraform'
-
-      - uses: opentofu/setup-opentofu@v1
-        with:
-          tofu_version: 1.9.0
-
-      - name: Initialize OpenTofu
-        run: tofu init
-        working-directory: infrastructure/opentofu/${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
-        env:
-          ARM_SAS_TOKEN: ${{ env.ARM_SAS_TOKEN }}
+              - 'backend/**'
 
   frontend:
     name: Lint, build and deploy frontend
     runs-on: ubuntu-latest
 
-    needs: [changes, infrastructure]
+    needs: [changes]
     if: ${{ needs.changes.outputs.frontend == 'true' }}
 
     steps:
@@ -107,3 +78,45 @@ jobs:
           action: 'upload'
           app_location: 'frontend/application/dist'
           skip_app_build: true
+
+  backend:
+    name: Lint, build and deploy backend
+    runs-on: ubuntu-latest
+
+    needs: [changes]
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.24.0
+
+      - name: Install dependencies
+        run: go mod download
+        working-directory: backend
+
+      - name: Run linter
+        run: test -z $(gofmt -l .)
+        working-directory: backend
+
+      - name: Build project
+        run: go build application/server.go
+        working-directory: backend
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: tobias-kaerst-software/flipsen:latest

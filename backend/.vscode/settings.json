@@ -1,0 +1,15 @@
+{
+  "cSpell.ignorePaths": ["go.mod", "go.sum"],
+
+  "explorer.fileNesting.patterns": {
+    "go.mod": "go.sum",
+    "Taskfile.yml": "Dockerfile"
+  },
+
+  "[json][jsonc][html][javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[go][go.mod]": {
+    "editor.defaultFormatter": "golang.go"
+  }
+}

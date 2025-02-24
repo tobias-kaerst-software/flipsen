@@ -1,0 +1,10 @@
+version: '3'
+
+tasks:
+  docker-build:
+    cmds:
+      - docker build -t flipsen/backend:latest .
+
+  docker-run:
+    cmds:
+      - docker run -it -p 8080:8080 flipsen/backend:latest
