@@ -21,7 +21,6 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: filter
         with:
-          base: ${{ github.ref }}
           filters: |
             frontend:
               - '.github/workflows/cd.yml'
