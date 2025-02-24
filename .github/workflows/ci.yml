@@ -23,7 +23,7 @@ jobs:
           base: ${{ github.ref }}
           filters: |
             frontend:
-              - '.github/workflows/cd.yml'
+              - '.github/workflows/ci.yml'
               - 'frontend/**'
 
   frontend:
