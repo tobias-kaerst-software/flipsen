@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
-      frontend: ${{ steps.filter.outputs.infrastructure }}
+      infrastructure: ${{ steps.filter.outputs.infrastructure }}
     steps:
       - uses: actions/checkout@v4
 
