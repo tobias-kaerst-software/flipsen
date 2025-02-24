@@ -19,7 +19,11 @@
 
     "workbench.editor.labelFormat": "short",
     "explorer.fileNesting.enabled": true,
-    "explorer.fileNesting.expand": false
+    "explorer.fileNesting.expand": false,
+
+    "files.associations": {
+      "*.css": "tailwindcss"
+    }
   },
   "extensions": {
     "recommendations": [

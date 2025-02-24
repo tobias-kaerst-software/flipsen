@@ -14,12 +14,15 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@modules/linter": "workspace:*",
+    "@tailwindcss/vite": "^4.0.8",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.8",
     "typescript": "~5.7.2",
     "vite": "^6.1.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "prettier": "@modules/linter/config/prettier.config.js"
+  "prettier": "@modules/linter/config/react/prettier.config.js"
 }

@@ -1,4 +1,8 @@
 {
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+
   "explorer.fileNesting.patterns": {
     "package.json": ".infisical.json,.gitignore,.editorconfig,tsconfig.json,eslint.config.ts,crowdin.yml,.env.local",
     "vite.config.ts": "index.html,lingui.config.ts",

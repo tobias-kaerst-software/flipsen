@@ -4,7 +4,8 @@
   "type": "module",
   "files": [
     "config/typescript/eslint.config.ts",
-    "config/typescript/prettier.config.js",    
+    "config/typescript/prettier.config.js",
+    "config/react/eslint.config.ts",
     "config/react/prettier.config.js"
   ],
   "devDependencies": {
@@ -23,5 +24,8 @@
     "eslint-plugin-unused-imports": "^4.1.4",
     "prettier": "^3.4.2",
     "typescript-eslint": "^8.22.0"
+  },
+  "dependencies": {
+    "prettier-plugin-tailwindcss": "^0.6.11"
   }
 }
