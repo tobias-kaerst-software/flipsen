@@ -19,7 +19,10 @@ resource "azurerm_linux_web_app" "name" {
     http2_enabled = true
 
     application_stack {
-      docker_image_name = "mcr.microsoft.com/appsvc/staticsite:latest"
+      docker_image_name        = "ghcr.io/tobias-kaerst-software/flipsen:latest"
+      docker_registry_url      = "https://ghcr.io"
+      docker_registry_username = local.docker_registry_username
+      docker_registry_password = local.docker_registry_password
     }
   }
 }

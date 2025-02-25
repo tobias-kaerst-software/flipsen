@@ -79,6 +79,9 @@ locals {
 
   upstash_email   = nonsensitive(data.infisical_secrets.env.secrets["UPSTASH_EMAIL"].value)
   upstash_api_key = data.infisical_secrets.env.secrets["UPSTASH_API_KEY"].value
+
+  docker_registry_username = nonsensitive(data.infisical_secrets.env.secrets["DOCKER_REGISTRY_USERNAME"].value)
+  docker_registry_password = data.infisical_secrets.env.secrets["DOCKER_REGISTRY_PASSWORD"].value
 }
 
 provider "azurerm" {
