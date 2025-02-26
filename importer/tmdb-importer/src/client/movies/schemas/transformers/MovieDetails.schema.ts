@@ -40,17 +40,9 @@ export const MovieDetailsSchema = TmdbMovieDetailsSchema.transform((data) => ({
   spokenLanguages: data.spoken_languages.map((language) => language.iso_639_1),
   productionCountries: data.production_countries.map((country) => country.iso_3166_1),
 
-  productionCompanies: data.production_companies.map((company) => ({
-    id: String(company.id),
-    name: company.name,
-    logoPath: company.logo_path,
-    originCountry: company.origin_country,
-  })),
-
-  alternativeTitles: data.alternative_titles.titles.map((title) => ({
-    country: title.iso_3166_1,
-    title: title.title,
-  })),
+  productionCompanies: data.production_companies,
+  alternativeTitles: data.alternative_titles,
+  images: data.images,
 
   translations: data.translations.translations
     .reduce<typeof data.translations.translations>((acc, translation) => {
@@ -71,44 +63,6 @@ export const MovieDetailsSchema = TmdbMovieDetailsSchema.transform((data) => ({
         title: translation.data.title,
       },
     })),
-
-  images: {
-    backdrops: data.images.backdrops
-      .reduce<typeof data.images.backdrops>((acc, backdrop) => {
-        if (!acc.some((item) => item.iso_639_1 === backdrop.iso_639_1)) acc.push(backdrop);
-        return acc;
-      }, [])
-      .map((backdrop) => ({
-        lang: backdrop.iso_639_1,
-        width: backdrop.width,
-        height: backdrop.height,
-        path: backdrop.file_path,
-      })),
-
-    logos: data.images.logos
-      .reduce<typeof data.images.logos>((acc, backdrop) => {
-        if (!acc.some((item) => item.iso_639_1 === backdrop.iso_639_1)) acc.push(backdrop);
-        return acc;
-      }, [])
-      .map((backdrop) => ({
-        lang: backdrop.iso_639_1,
-        width: backdrop.width,
-        height: backdrop.height,
-        path: backdrop.file_path,
-      })),
-
-    posters: data.images.posters
-      .reduce<typeof data.images.posters>((acc, backdrop) => {
-        if (!acc.some((item) => item.iso_639_1 === backdrop.iso_639_1)) acc.push(backdrop);
-        return acc;
-      }, [])
-      .map((backdrop) => ({
-        lang: backdrop.iso_639_1,
-        width: backdrop.width,
-        height: backdrop.height,
-        path: backdrop.file_path,
-      })),
-  },
 
   releaseDates: data.release_dates.results.map((result) => ({
     country: result.iso_3166_1,

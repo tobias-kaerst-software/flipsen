@@ -66,5 +66,3 @@ export const generateMovieEmbedding = async (movie: MovieDetails) => {
 
   return embedding.data.data[0].embedding;
 };
-
-// 330 tokens

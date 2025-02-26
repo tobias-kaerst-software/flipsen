@@ -1,10 +1,12 @@
+import { getCompleteTvDetails } from '$/client/tv';
+
 import {
   generateMovieEmbedding,
   getMovieDetailsById,
   transformMovieDetailsToSearchPayload,
 } from './client/movies';
 
-export const importer = async () => {
+export const movieImporter = async () => {
   const movieId = '549509';
 
   const movie = await getMovieDetailsById(movieId);
@@ -25,4 +27,18 @@ export const importer = async () => {
   return null;
 };
 
-importer();
+export const tvImporter = async () => {
+  const tvId = '94605';
+
+  // const tv = await getTvDetails(tvId);
+  // const tv = await getTvSeasonDetails(tvId, 1);
+  // const tv = await getTvEpisodeDetails(tvId, 1, 1);
+
+  const tv = await getCompleteTvDetails(tvId);
+
+  if (tv) {
+    Bun.write(`output/${tvId}.json`, JSON.stringify(tv, null, 2));
+  }
+};
+
+tvImporter();

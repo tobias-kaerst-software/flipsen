@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
-import { TmdbBasicMoviePersonSchema } from '$/client/movies/schemas/TmdbBasicMoviePerson.schema';
-import { TmdbMovieImageSchema } from '$/client/movies/schemas/TmdbMovieImage.schema';
+import { TmdbAlternativeTitlesSchema } from '$/client/general/schemas/TmdbAlternativeTitles.schema';
+import { TmdbBasicPersonSchema } from '$/client/general/schemas/TmdbBasicPerson.schema';
+import { TmdbImagesSchema } from '$/client/general/schemas/TmdbImage.schema';
+import { TmdbProductionCompaniesSchema } from '$/client/general/schemas/TmdbProductionCompanies.schema';
 
 export const TmdbMovieDetailsSchema = z.object({
   id: z.number(),
@@ -30,18 +32,13 @@ export const TmdbMovieDetailsSchema = z.object({
 
   spoken_languages: z.array(z.object({ iso_639_1: z.string() })),
   production_countries: z.array(z.object({ iso_3166_1: z.string() })),
+  production_companies: TmdbProductionCompaniesSchema,
+  alternative_titles: TmdbAlternativeTitlesSchema,
+  images: TmdbImagesSchema,
 
   belongs_to_collection: z
     .object({ id: z.number(), name: z.string(), poster_path: z.string(), backdrop_path: z.string() })
     .nullable(),
-
-  production_companies: z.array(
-    z.object({ id: z.number(), name: z.string(), logo_path: z.string().nullable(), origin_country: z.string() }),
-  ),
-
-  alternative_titles: z.object({
-    titles: z.array(z.object({ iso_3166_1: z.string(), title: z.string() })),
-  }),
 
   translations: z.object({
     translations: z.array(
@@ -56,12 +53,6 @@ export const TmdbMovieDetailsSchema = z.object({
         }),
       }),
     ),
-  }),
-
-  images: z.object({
-    backdrops: z.array(TmdbMovieImageSchema),
-    logos: z.array(TmdbMovieImageSchema),
-    posters: z.array(TmdbMovieImageSchema),
   }),
 
   release_dates: z.object({
@@ -84,10 +75,10 @@ export const TmdbMovieDetailsSchema = z.object({
     cast: z.array(
       z
         .object({ cast_id: z.number(), character: z.string(), credit_id: z.string(), order: z.number() })
-        .and(TmdbBasicMoviePersonSchema),
+        .and(TmdbBasicPersonSchema),
     ),
     crew: z.array(
-      z.object({ credit_id: z.string(), department: z.string(), job: z.string() }).and(TmdbBasicMoviePersonSchema),
+      z.object({ credit_id: z.string(), department: z.string(), job: z.string() }).and(TmdbBasicPersonSchema),
     ),
   }),
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const TmdbBasicMoviePersonSchema = z.object({
+export const TmdbBasicPersonSchema = z.object({
   adult: z.boolean(),
   gender: z.number(),
   id: z.number(),
