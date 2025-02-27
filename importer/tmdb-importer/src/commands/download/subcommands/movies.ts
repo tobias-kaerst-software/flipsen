@@ -4,7 +4,7 @@ import PQueue from 'p-queue';
 import path from 'path';
 import readline from 'readline';
 
-import { getMovieDetailsById } from '$/client/movies';
+import { getMovieDetailsById } from '$/features/tmdb/movies';
 import { logger } from '$/utils/logger';
 
 export const moviesCommand = new Command()
