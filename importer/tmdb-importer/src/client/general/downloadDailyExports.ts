@@ -30,7 +30,7 @@ export const downloadDailyExports = async (output: string) => {
 };
 
 export const downloadDailyExport = async (output: string, type: TmdbExportType) => {
-  const filename = `${type}_ids_${getTmdbDateString()}.json`;
+  const filename = `${type}_ids_${getTmdbDateString()}.jsonl`;
   const outputPath = path.resolve(output, filename);
 
   const downloadUrl = `http://files.tmdb.org/p/exports/${filename}.gz`;
