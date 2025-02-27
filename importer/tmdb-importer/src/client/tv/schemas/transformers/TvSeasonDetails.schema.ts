@@ -40,6 +40,8 @@ export const TvSeasonDetailsSchema = RawTvSeasonDetailsSchema.transform((data) =
     crew: data.credits.crew.map((crew) => crew.credit_id),
   },
 
+  videos: data.videos.results,
+
   episodes: data.episodes.map((episode) => ({
     episodeNumber: episode.episode_number,
   })),

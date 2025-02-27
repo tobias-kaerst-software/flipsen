@@ -10,11 +10,11 @@ export const RawTvEpisodeDetailsSchema = z.object({
 
   name: z.string(),
   overview: z.string(),
-  air_date: z.string(),
+  air_date: z.string().nullable(),
   vote_average: z.number(),
   vote_count: z.number(),
   production_code: z.string(),
-  runtime: z.number(),
+  runtime: z.number().nullable(),
 
   images: TmdbImagesSchema,
 

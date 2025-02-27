@@ -34,7 +34,7 @@ export const TvDetailsSchema = RawTvDetailsSchema.transform((data) => ({
   productionCountries: data.production_countries.map((country) => country.iso_3166_1),
 
   productionCompanies: data.production_companies,
-  alternativeTitles: data.alternative_titles,
+  alternativeTitles: data.alternative_titles.results,
   images: data.images,
 
   translations: data.translations.translations

@@ -41,26 +41,23 @@ export const MovieDetailsSchema = TmdbMovieDetailsSchema.transform((data) => ({
   productionCountries: data.production_countries.map((country) => country.iso_3166_1),
 
   productionCompanies: data.production_companies,
-  alternativeTitles: data.alternative_titles,
+  alternativeTitles: data.alternative_titles.titles,
   images: data.images,
 
   translations: data.translations.translations
     .reduce<typeof data.translations.translations>((acc, translation) => {
-      if (
-        !acc.some((item) => item.iso_639_1 === translation.iso_639_1) &&
-        ['de', 'en'].includes(translation.iso_639_1)
-      )
+      if (!acc.some((item) => item.iso_639_1 === translation.iso_639_1) && ['en'].includes(translation.iso_639_1))
         acc.push(translation);
       return acc;
     }, [])
     .map((translation) => ({
       language: translation.iso_639_1,
       data: {
-        homepage: translation.data.homepage,
-        overview: translation.data.overview,
-        runtime: translation.data.runtime,
-        tagline: translation.data.tagline,
-        title: translation.data.title,
+        ...(translation.data.homepage ? { homepage: translation.data.homepage } : {}),
+        ...(translation.data.overview ? { overview: translation.data.overview } : {}),
+        ...(translation.data.tagline ? { tagline: translation.data.tagline } : {}),
+        ...(translation.data.runtime ? { runtime: translation.data.runtime } : {}),
+        ...(translation.data.title ? { title: translation.data.title } : {}),
       },
     })),
 
@@ -111,6 +108,8 @@ export const MovieDetailsSchema = TmdbMovieDetailsSchema.transform((data) => ({
     instagramId: data.external_ids.instagram_id,
     twitterId: data.external_ids.twitter_id,
   },
+
+  videos: data.videos.results,
 }));
 
 export type MovieDetails = z.infer<typeof MovieDetailsSchema>;

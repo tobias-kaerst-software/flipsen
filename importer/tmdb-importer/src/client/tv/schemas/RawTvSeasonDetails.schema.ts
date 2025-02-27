@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { TmdbImagesSchema } from '$/client/general/schemas/TmdbImage.schema';
+import { TmdbVideosSchema } from '$/client/general/schemas/TmdbVideo.schema';
 
 export const RawTvSeasonDetailsSchema = z.object({
   id: z.number(),
@@ -8,7 +9,7 @@ export const RawTvSeasonDetailsSchema = z.object({
 
   name: z.string(),
   overview: z.string(),
-  air_date: z.string(),
+  air_date: z.string().nullable(),
   vote_average: z.number(),
 
   images: TmdbImagesSchema,
@@ -37,6 +38,8 @@ export const RawTvSeasonDetailsSchema = z.object({
     cast: z.array(z.object({ credit_id: z.string() })),
     crew: z.array(z.object({ credit_id: z.string() })),
   }),
+
+  videos: z.object({ results: TmdbVideosSchema }),
 
   episodes: z.array(z.object({ episode_number: z.number() })),
 });

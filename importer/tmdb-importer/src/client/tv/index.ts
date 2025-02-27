@@ -53,19 +53,18 @@ export const getCompleteTvDetails = async (id: string) => {
 };
 
 export const getTvDetails = async (id: string): Promise<TvDetails | undefined> => {
-  const searchParams = new URLSearchParams({
-    language: 'de-DE',
-    append_to_response:
-      'alternative_titles,content_ratings,external_ids,images,keywords,translations,aggregate_credits',
-    include_image_language: 'de,en,null',
-  });
-
   const res = await tmdb
-    .get(`tv/${id}`, { searchParams })
-    .json()
-    .catch((e) => e.name);
+    .get(`tv/${id}`, {
+      params: {
+        language: 'de-DE',
+        append_to_response:
+          'alternative_titles,content_ratings,external_ids,images,keywords,translations,aggregate_credits',
+        include_image_language: 'de,en,null',
+      },
+    })
+    .catch(() => undefined);
 
-  const tv = TvDetailsSchema.safeParse(res);
+  const tv = TvDetailsSchema.safeParse(res?.data);
 
   if (!tv.success) {
     return logger.error('COULD_NOT_FETCH_TV_DETAILS', tv.error, { id });
@@ -75,18 +74,18 @@ export const getTvDetails = async (id: string): Promise<TvDetails | undefined> =
 };
 
 export const getTvSeasonDetails = async (id: string, season: number): Promise<TvSeasonDetails | undefined> => {
-  const searchParams = new URLSearchParams({
-    language: 'de-DE',
-    append_to_response: 'translations,external_ids,images,credits',
-    include_image_language: 'de,en,null',
-  });
-
   const res = await tmdb
-    .get(`tv/${id}/season/${season}`, { searchParams })
-    .json()
-    .catch((e) => e.name);
+    .get(`tv/${id}/season/${season}`, {
+      params: {
+        language: 'de-DE',
+        append_to_response: 'translations,external_ids,images,credits,videos',
+        include_image_language: 'de,en,null',
+        include_video_language: 'de,en,null',
+      },
+    })
+    .catch(() => undefined);
 
-  const tv = TvSeasonDetailsSchema.safeParse(res);
+  const tv = TvSeasonDetailsSchema.safeParse(res?.data);
 
   if (!tv.success) {
     return logger.error('COULD_NOT_FETCH_TV_SEASON_DETAILS', tv.error, { id });
@@ -100,18 +99,17 @@ export const getTvEpisodeDetails = async (
   season: number,
   episode: number,
 ): Promise<TvEpisodeDetails | undefined> => {
-  const searchParams = new URLSearchParams({
-    language: 'de-DE',
-    append_to_response: 'images,translations,external_ids,credits',
-    include_image_language: 'de,en,null',
-  });
-
   const res = await tmdb
-    .get(`tv/${id}/season/${season}/episode/${episode}`, { searchParams })
-    .json()
-    .catch((e) => e.name);
+    .get(`tv/${id}/season/${season}/episode/${episode}`, {
+      params: {
+        language: 'de-DE',
+        append_to_response: 'images,translations,external_ids,credits',
+        include_image_language: 'de,en,null',
+      },
+    })
+    .catch(() => undefined);
 
-  const tv = TvEpisodeDetailsSchema.safeParse(res);
+  const tv = TvEpisodeDetailsSchema.safeParse(res?.data);
 
   if (!tv.success) {
     return logger.error('COULD_NOT_FETCH_TV_EPISODE_DETAILS', tv.error, { id });

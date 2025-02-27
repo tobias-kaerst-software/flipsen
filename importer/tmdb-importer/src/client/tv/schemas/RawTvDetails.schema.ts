@@ -37,7 +37,7 @@ export const RawTvDetailsSchema = z.object({
   production_countries: z.array(z.object({ iso_3166_1: z.string() })),
 
   production_companies: TmdbProductionCompaniesSchema,
-  alternative_titles: TmdbAlternativeTitlesSchema,
+  alternative_titles: z.object({ results: TmdbAlternativeTitlesSchema }),
   images: TmdbImagesSchema,
 
   translations: z.object({

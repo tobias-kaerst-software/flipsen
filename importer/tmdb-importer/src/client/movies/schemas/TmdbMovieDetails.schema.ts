@@ -4,6 +4,7 @@ import { TmdbAlternativeTitlesSchema } from '$/client/general/schemas/TmdbAltern
 import { TmdbBasicPersonSchema } from '$/client/general/schemas/TmdbBasicPerson.schema';
 import { TmdbImagesSchema } from '$/client/general/schemas/TmdbImage.schema';
 import { TmdbProductionCompaniesSchema } from '$/client/general/schemas/TmdbProductionCompanies.schema';
+import { TmdbVideosSchema } from '$/client/general/schemas/TmdbVideo.schema';
 
 export const TmdbMovieDetailsSchema = z.object({
   id: z.number(),
@@ -28,16 +29,24 @@ export const TmdbMovieDetailsSchema = z.object({
   origin_country: z.array(z.string()),
 
   genres: z.array(z.object({ name: z.string() })),
-  keywords: z.object({ keywords: z.array(z.object({ name: z.string() })) }),
+  keywords: z
+    .object({ keywords: z.array(z.object({ name: z.string() })) })
+    .optional()
+    .default({ keywords: [] }),
 
   spoken_languages: z.array(z.object({ iso_639_1: z.string() })),
   production_countries: z.array(z.object({ iso_3166_1: z.string() })),
   production_companies: TmdbProductionCompaniesSchema,
-  alternative_titles: TmdbAlternativeTitlesSchema,
+  alternative_titles: z.object({ titles: TmdbAlternativeTitlesSchema }),
   images: TmdbImagesSchema,
 
   belongs_to_collection: z
-    .object({ id: z.number(), name: z.string(), poster_path: z.string(), backdrop_path: z.string() })
+    .object({
+      id: z.number(),
+      name: z.string(),
+      poster_path: z.string().nullable(),
+      backdrop_path: z.string().nullable(),
+    })
     .nullable(),
 
   translations: z.object({
@@ -45,42 +54,48 @@ export const TmdbMovieDetailsSchema = z.object({
       z.object({
         iso_639_1: z.string(),
         data: z.object({
-          homepage: z.string(),
-          overview: z.string(),
-          runtime: z.number(),
-          tagline: z.string(),
-          title: z.string(),
+          homepage: z.string().nullable(),
+          overview: z.string().nullable(),
+          runtime: z.number().nullable(),
+          tagline: z.string().nullable(),
+          title: z.string().nullable(),
         }),
       }),
     ),
   }),
 
-  release_dates: z.object({
-    results: z.array(
-      z.object({
-        iso_3166_1: z.string(),
-        release_dates: z.array(
-          z.object({
-            certification: z.string(),
-            note: z.string(),
-            release_date: z.string(),
-            type: z.number(),
-          }),
-        ),
-      }),
-    ),
-  }),
+  release_dates: z
+    .object({
+      results: z.array(
+        z.object({
+          iso_3166_1: z.string(),
+          release_dates: z.array(
+            z.object({
+              certification: z.string(),
+              note: z.string(),
+              release_date: z.string(),
+              type: z.number(),
+            }),
+          ),
+        }),
+      ),
+    })
+    .optional()
+    .default({ results: [] }),
 
-  credits: z.object({
-    cast: z.array(
-      z
-        .object({ cast_id: z.number(), character: z.string(), credit_id: z.string(), order: z.number() })
-        .and(TmdbBasicPersonSchema),
-    ),
-    crew: z.array(
-      z.object({ credit_id: z.string(), department: z.string(), job: z.string() }).and(TmdbBasicPersonSchema),
-    ),
-  }),
+  credits: z
+    .object({
+      cast: z.array(
+        z
+          .object({ cast_id: z.number(), character: z.string(), credit_id: z.string(), order: z.number() })
+          .and(TmdbBasicPersonSchema),
+      ),
+      crew: z.array(
+        z.object({ credit_id: z.string(), department: z.string(), job: z.string() }).and(TmdbBasicPersonSchema),
+      ),
+    })
+    .optional()
+    .default({ cast: [], crew: [] }),
 
   external_ids: z.object({
     imdb_id: z.string().nullable(),
@@ -89,4 +104,6 @@ export const TmdbMovieDetailsSchema = z.object({
     instagram_id: z.string().nullable(),
     twitter_id: z.string().nullable(),
   }),
+
+  videos: z.object({ results: TmdbVideosSchema }).optional().default({ results: [] }),
 });

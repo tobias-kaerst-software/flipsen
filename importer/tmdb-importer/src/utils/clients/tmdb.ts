@@ -1,11 +1,15 @@
-import ky from 'ky';
+import axios from 'axios';
+import * as AxiosLogger from 'axios-logger';
+import rateLimit from 'axios-rate-limit';
 
 import { env } from '$/config';
 
-export const tmdb = ky.create({
-  headers: { Authorization: `Bearer ${env.TMDB_API_KEY}` },
-  prefixUrl: 'https://api.themoviedb.org/3',
-  hooks: {
-    beforeRequest: [async () => {}],
-  },
-});
+export const tmdb = rateLimit(
+  axios.create({
+    baseURL: 'https://api.themoviedb.org/3',
+    headers: { Authorization: `Bearer ${env.TMDB_API_KEY}` },
+  }),
+  { maxRequests: 45, perMilliseconds: 1000 },
+);
+
+tmdb.interceptors.request.use(AxiosLogger.requestLogger);

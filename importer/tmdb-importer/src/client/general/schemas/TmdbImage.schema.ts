@@ -17,6 +17,8 @@ export const TmdbImagesSchema = z
     posters: z.array(TmdbImageSchema).optional().default([]),
     stills: z.array(TmdbImageSchema).optional().default([]),
   })
+  .optional()
+  .default({ backdrops: [], logos: [], posters: [], stills: [] })
   .transform((data) => ({
     backdrops: data.backdrops
       .reduce<typeof data.backdrops>((acc, backdrop) => {
