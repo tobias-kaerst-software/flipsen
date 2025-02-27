@@ -1,16 +1,14 @@
-import { createReadStream } from 'fs';
+import { Command } from 'commander';
+import { createReadStream, existsSync } from 'fs';
 import PQueue from 'p-queue';
 import readline from 'readline';
 
+import type { TmdbExportType } from '$/client/general/downloadDailyExports';
+
+import { downloadDailyExport, downloadDailyExports } from '$/client/general/downloadDailyExports';
 import { getCompleteTvDetails } from '$/client/tv';
 
 import { getMovieDetailsById } from './client/movies';
-
-// http://files.tmdb.org/p/exports/movie_ids_02_26_2025.json.gz
-// http://files.tmdb.org/p/exports/tv_series_02_26_2025.json.gz
-// http://files.tmdb.org/p/exports/person_ids_02_26_2025.json.gz
-// http://files.tmdb.org/p/exports/collection_ids_02_26_2025.json.gz
-// http://files.tmdb.org/p/exports/production_company_ids_02_26_2025.json.gz
 
 export const movieImporter = async () => {
   const movieId = '549509';
@@ -109,3 +107,42 @@ export const downloadFailedMovies = async () => {
     Bun.write(`output/${random_hash}/missing-movies.json`, JSON.stringify(missingIds, null, 2));
   });
 };
+
+const program = new Command();
+
+program
+  .name('tmdb-importer-tool')
+  .description('CLI to download and process TMDB data.')
+  .version('0.0.0')
+  .showHelpAfterError();
+
+program
+  .command('download-daily-export')
+  .description('Download the daily export files from TMDB.')
+  .option('--out-dir, -o <string>', 'Output directory', '.')
+  .option(
+    '--type, -t <collection | movie | person | production_company | tv_series>',
+    'Type to download. Downloads all if not specified.',
+    'all',
+  )
+  .action(async (options: { outDir: string; type: 'all' | TmdbExportType }) => {
+    if (!existsSync(options.outDir)) {
+      console.error(`Output directory ${options.outDir} does not exist.`);
+      process.exit(1);
+    }
+
+    if (options.type === 'all') {
+      const downloadLocations = await downloadDailyExports(options.outDir);
+      console.log(`Downloaded daily export to ${JSON.stringify(downloadLocations, null, 2)}`);
+      return;
+    }
+
+    const downloadLocation = await downloadDailyExport(options.outDir, options.type);
+    console.log(`Downloaded daily export to ${downloadLocation}`);
+  });
+
+if (process.argv.length === 2) {
+  process.argv.push('-h');
+}
+
+program.parse();

@@ -9,6 +9,7 @@
     "axios": "^1.8.1",
     "axios-logger": "^2.8.1",
     "axios-rate-limit": "^1.4.0",
+    "commander": "^13.1.0",
     "ky": "^1.7.5",
     "p-queue": "^8.1.0",
     "picocolors": "^1.1.1",
