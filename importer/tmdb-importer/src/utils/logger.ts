@@ -17,11 +17,11 @@ export const logger = {
     return undefined;
   },
   info: (msg: string, payload?: object) => {
-    consoleWriter.write(`INFO: ${msg}` + '\n' + JSON.stringify(payload, null, 2));
+    consoleWriter.write(`INFO: ${msg}` + (payload ? '\n' + JSON.stringify(payload, null, 2) : ''));
     return undefined;
   },
   debug: (msg: string, payload?: object) => {
-    consoleWriter.write(`DEBUG: ${msg}` + '\n' + JSON.stringify(payload, null, 2));
+    consoleWriter.write(`DEBUG: ${msg}` + (payload ? '\n' + JSON.stringify(payload, null, 2) : ''));
     return undefined;
   },
 };

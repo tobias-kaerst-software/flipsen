@@ -1,12 +1,11 @@
 import type { AxiosError } from 'axios';
 
-import type { MovieDetails } from '$/client/movies/schemas/transformers/MovieDetails.schema';
-
-import { MovieDetailsSchema } from '$/client/movies/schemas/transformers/MovieDetails.schema';
-import { openai } from '$/utils/clients/openai';
+import {
+  type MovieDetails,
+  MovieDetailsSchema,
+} from '$/features/tmdb/movies/schemas/transformers/MovieDetails.schema';
 import { tmdb } from '$/utils/clients/tmdb';
 import { logger } from '$/utils/logger';
-import { EmbeddingResponseSchema } from '$/utils/schemas/openai.schema';
 
 type MovieDetailsResponse = {
   data: MovieDetails | undefined;
@@ -42,42 +41,20 @@ export const getMovieDetailsById = async (id: string): Promise<MovieDetailsRespo
   return { data: movie.data, err: undefined, status: 200 };
 };
 
-export const transformMovieDetailsToSearchPayload = (movie: MovieDetails) => {
-  return {
-    id: movie.id,
-    title: movie.title,
-    overview: movie.overview,
-    tagline: movie.tagline,
-    runtime: movie.runtime,
-    voteAverage: movie.voteAverage,
-    voteCount: movie.voteCount,
-    releaseDate: movie.releaseDate,
-    status: movie.status,
-    popularity: movie.popularity,
-    genres: movie.genres,
-    keywords: movie.keywords,
-    originCountry: movie.originCountry,
-    belongsToCollection: movie.belongsToCollection,
-    productionCompanies: movie.productionCompanies.map((company) => company.name),
+export const movieToBatchEmbeddingOperation = (movie: MovieDetails) => {
+  const movieInput = [
+    `Title: ${movie.title}`,
+    `Genres: ${movie.genres.join(', ')}`,
+    `Keywords: ${movie.keywords.join(', ')}`,
+    `Overview: ${movie.overview}`,
+  ].join('; ');
+
+  const request = {
+    custom_id: movie.id,
+    method: 'POST',
+    url: '/v1/embeddings',
+    body: { input: movieInput, model: 'text-embedding-3-small' },
   };
-};
 
-export const generateMovieEmbedding = async (movie: MovieDetails) => {
-  const movieInput = `Title: ${movie.title}; Genres: ${movie.genres.join(', ')}; Keywords: ${movie.keywords.join(', ')}; Overview: ${movie.overview}.`;
-
-  const res = await openai
-    .post('embeddings ', {
-      json: { input: movieInput, model: 'text-embedding-3-small', encoding_format: 'float' },
-    })
-    .json();
-
-  const embedding = EmbeddingResponseSchema.safeParse(res);
-
-  console.log(embedding);
-
-  if (!embedding.success) {
-    return logger.error('COULD_NOT_CREATE_MOVIE_EMBEDDING', embedding.error, { id: movie.id, movieInput });
-  }
-
-  return embedding.data.data[0].embedding;
+  return JSON.stringify(request, null, 0);
 };
