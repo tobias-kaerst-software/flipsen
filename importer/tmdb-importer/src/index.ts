@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 
 import { downloadCommand } from '$/commands/download';
-import { embeddingCommands } from '$/commands/embeddings';
+import { openaiCommands } from '$/commands/openai';
 
 const program = new Command();
 
@@ -10,7 +10,7 @@ program
   .description('CLI to download and process TMDB data.')
   .version('0.0.0')
   .addCommand(downloadCommand)
-  .addCommand(embeddingCommands);
+  .addCommand(openaiCommands);
 
 if (process.argv.length === 2) {
   process.argv.push('-h');

@@ -41,20 +41,19 @@ export const getMovieDetailsById = async (id: string): Promise<MovieDetailsRespo
   return { data: movie.data, err: undefined, status: 200 };
 };
 
-export const movieToBatchEmbeddingOperation = (movie: MovieDetails) => {
-  const movieInput = [
-    `Title: ${movie.title}`,
-    `Genres: ${movie.genres.join(', ')}`,
-    `Keywords: ${movie.keywords.join(', ')}`,
-    `Overview: ${movie.overview}`,
-  ].join('; ');
-
-  const request = {
-    custom_id: movie.id,
-    method: 'POST',
-    url: '/v1/embeddings',
-    body: { input: movieInput, model: 'text-embedding-3-small' },
+export const movieToBatchInput = (movie: MovieDetails) => {
+  const translated = {
+    title: movie.title,
+    genres: movie.genres,
+    keywords: movie.keywords,
+    overview: movie.overview,
+    ...movie.translations.find((t) => t.language === 'en')?.data,
   };
 
-  return JSON.stringify(request, null, 0);
+  return [
+    `Title: ${translated.title || 'Unknown Title'}`,
+    `Genres: ${translated.genres.join(', ') || 'Unknown Genres'}`,
+    `Keywords: ${translated.keywords.join(', ') || 'Unknown Keywords'}`,
+    `Overview: ${translated.overview || 'Unknown Overview'}`,
+  ].join('; ');
 };
