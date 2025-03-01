@@ -1,10 +1,12 @@
 package main
 
 import (
+	"compress/gzip"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,19 +32,43 @@ func proxyHandler(c *gin.Context) {
 		}
 	}
 
+	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
+
 	if err != nil {
 		log.Println("Failed to forward request:", err)
 		c.JSON(http.StatusBadGateway, gin.H{"error": "Failed to forward request"})
 		return
 	}
+
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read response"})
-		return
+	var body []byte
+	if strings.Contains(resp.Header.Get("Content-Encoding"), "gzip") {
+		gzipReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decompress response"})
+			return
+		}
+		body, err = io.ReadAll(gzipReader)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read decompressed response"})
+			return
+		}
+	} else if strings.Contains(resp.Header.Get("Content-Encoding"), "br") {
+		body, err = io.ReadAll(resp.Body)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read Brotli response"})
+			return
+		}
+	} else {
+		body, err = io.ReadAll(resp.Body)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read response"})
+			return
+		}
 	}
 
 	c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
