@@ -91,7 +91,9 @@ export const TmdbMovieDetailsSchema = z.object({
           .and(TmdbBasicPersonSchema),
       ),
       crew: z.array(
-        z.object({ credit_id: z.string(), department: z.string(), job: z.string() }).and(TmdbBasicPersonSchema),
+        z
+          .object({ credit_id: z.string(), department: z.string(), job: z.string() })
+          .and(TmdbBasicPersonSchema),
       ),
     })
     .optional()

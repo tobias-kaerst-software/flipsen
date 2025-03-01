@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { TmdbBasicPersonSchema } from '$/client/general/schemas/TmdbBasicPerson.schema';
-import { TmdbImagesSchema } from '$/client/general/schemas/TmdbImage.schema';
+import { TmdbBasicPersonSchema } from '$/features/tmdb/general/schemas/TmdbBasicPerson.schema';
+import { TmdbImagesSchema } from '$/features/tmdb/general/schemas/TmdbImage.schema';
 
 export const RawTvEpisodeDetailsSchema = z.object({
   id: z.number(),
@@ -42,14 +42,16 @@ export const RawTvEpisodeDetailsSchema = z.object({
   credits: z.object({
     cast: z.array(z.object({ credit_id: z.string() })),
     crew: z.array(z.object({ credit_id: z.string() })),
-    guest_stars: z.array(
-      z
-        .object({
-          credit_id: z.string(),
-          character: z.string(),
-          order: z.number(),
-        })
-        .and(TmdbBasicPersonSchema),
-    ),
+    guest_stars: z
+      .array(
+        z
+          .object({
+            credit_id: z.string(),
+            character: z.string(),
+            order: z.number(),
+          })
+          .and(TmdbBasicPersonSchema),
+      )
+      .optional(),
   }),
 });

@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 
-import { RawTvEpisodeDetailsSchema } from '$/client/tv/schemas/RawTvEpisodeDetails.schema';
+import { RawTvEpisodeDetailsSchema } from '$/features/tmdb/tv/schemas/RawTvEpisodeDetails.schema';
 
 export const TvEpisodeDetailsSchema = RawTvEpisodeDetailsSchema.transform((data) => ({
   id: String(data.id),
@@ -19,7 +19,10 @@ export const TvEpisodeDetailsSchema = RawTvEpisodeDetailsSchema.transform((data)
 
   translations: data.translations.translations
     .reduce<typeof data.translations.translations>((acc, translation) => {
-      if (!acc.some((item) => item.iso_639_1 === translation.iso_639_1) && ['en'].includes(translation.iso_639_1))
+      if (
+        !acc.some((item) => item.iso_639_1 === translation.iso_639_1) &&
+        ['en'].includes(translation.iso_639_1)
+      )
         acc.push(translation);
       return acc;
     }, [])
@@ -43,8 +46,8 @@ export const TvEpisodeDetailsSchema = RawTvEpisodeDetailsSchema.transform((data)
   credits: {
     cast: data.credits.cast.map((cast) => cast.credit_id),
     crew: data.credits.crew.map((crew) => crew.credit_id),
-    guestStars: data.credits.guest_stars.map((guest) => guest.credit_id),
-    fullGuestsStars: data.credits.guest_stars.map((guest) => ({
+    guestStars: data.credits.guest_stars?.map((guest) => guest.credit_id) ?? [],
+    fullGuestsStars: data.credits.guest_stars?.map((guest) => ({
       adult: guest.adult,
       gender: guest.gender,
       id: guest.id,

@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { TmdbAlternativeTitlesSchema } from '$/client/general/schemas/TmdbAlternativeTitles.schema';
-import { TmdbBasicPersonSchema } from '$/client/general/schemas/TmdbBasicPerson.schema';
-import { TmdbImagesSchema } from '$/client/general/schemas/TmdbImage.schema';
-import { TmdbProductionCompaniesSchema } from '$/client/general/schemas/TmdbProductionCompanies.schema';
+import { TmdbAlternativeTitlesSchema } from '$/features/tmdb/general/schemas/TmdbAlternativeTitles.schema';
+import { TmdbBasicPersonSchema } from '$/features/tmdb/general/schemas/TmdbBasicPerson.schema';
+import { TmdbImagesSchema } from '$/features/tmdb/general/schemas/TmdbImage.schema';
+import { TmdbProductionCompaniesSchema } from '$/features/tmdb/general/schemas/TmdbProductionCompanies.schema';
 
 export const RawTvDetailsSchema = z.object({
   id: z.number(),
@@ -15,7 +15,7 @@ export const RawTvDetailsSchema = z.object({
   homepage: z.string(),
 
   first_air_date: z.string(),
-  last_air_date: z.string(),
+  last_air_date: z.string().nullable(),
   status: z.string(),
   vote_average: z.number(),
   vote_count: z.number(),
@@ -87,7 +87,9 @@ export const RawTvDetailsSchema = z.object({
     cast: z.array(
       z
         .object({
-          roles: z.array(z.object({ character: z.string(), episode_count: z.number(), credit_id: z.string() })),
+          roles: z.array(
+            z.object({ character: z.string(), episode_count: z.number(), credit_id: z.string() }),
+          ),
           total_episode_count: z.number(),
           order: z.number(),
         })

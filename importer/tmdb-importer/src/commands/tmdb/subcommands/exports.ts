@@ -23,10 +23,18 @@ export const dailyExportsCommand = new Command()
 
     if (options.type === 'all') {
       const downloadLocations = await downloadDailyExports(options.outDir);
-      logger.info('Successfully downloaded daily exports', { locations: downloadLocations });
+      const locations = downloadLocations.map((location) => location.data).filter(Boolean);
+
+      if (locations.length !== 0) {
+        logger.info('Successfully downloaded daily exports', { locations });
+      }
+
       return;
     }
 
-    const downloadLocation = await downloadDailyExport(options.outDir, options.type);
-    logger.info(`Successfully downloaded daily ${options.type} export`, { location: downloadLocation });
+    const { data } = await downloadDailyExport(options.outDir, options.type);
+
+    if (data) {
+      logger.info(`Successfully downloaded daily ${options.type} export`, { location: data });
+    }
   });

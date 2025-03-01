@@ -5,3 +5,8 @@ tasks:
     dir: 'opentofu/development'
     cmds:
       - infisical run --path="/terraform" -- {{.CLI_ARGS}}
+
+  proxies:
+    dir: 'opentofu/proxies'
+    cmds:
+      - infisical run --path="/terraform" -- {{.CLI_ARGS}}

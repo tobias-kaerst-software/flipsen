@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 
-import { RawTvSeasonDetailsSchema } from '$/client/tv/schemas/RawTvSeasonDetails.schema';
+import { RawTvSeasonDetailsSchema } from '$/features/tmdb/tv/schemas/RawTvSeasonDetails.schema';
 
 export const TvSeasonDetailsSchema = RawTvSeasonDetailsSchema.transform((data) => ({
   id: String(data.id),
@@ -15,7 +15,10 @@ export const TvSeasonDetailsSchema = RawTvSeasonDetailsSchema.transform((data) =
 
   translations: data.translations.translations
     .reduce<typeof data.translations.translations>((acc, translation) => {
-      if (!acc.some((item) => item.iso_639_1 === translation.iso_639_1) && ['en'].includes(translation.iso_639_1))
+      if (
+        !acc.some((item) => item.iso_639_1 === translation.iso_639_1) &&
+        ['en'].includes(translation.iso_639_1)
+      )
         acc.push(translation);
       return acc;
     }, [])

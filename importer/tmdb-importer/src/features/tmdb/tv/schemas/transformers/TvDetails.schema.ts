@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 
-import { RawTvDetailsSchema } from '$/client/tv/schemas/RawTvDetails.schema';
+import { RawTvDetailsSchema } from '$/features/tmdb/tv/schemas/RawTvDetails.schema';
 
 export const TvDetailsSchema = RawTvDetailsSchema.transform((data) => ({
   id: String(data.id),

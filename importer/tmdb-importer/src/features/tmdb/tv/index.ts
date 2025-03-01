@@ -1,119 +1,76 @@
-import type { TvDetails } from '$/client/tv/schemas/transformers/TvDetails.schema';
-
-import { TvDetailsSchema } from '$/client/tv/schemas/transformers/TvDetails.schema';
-import {
-  type TvEpisodeDetails,
-  TvEpisodeDetailsSchema,
-} from '$/client/tv/schemas/transformers/TvEpisodeDetails.schema';
-import {
-  type TvSeasonDetails,
-  TvSeasonDetailsSchema,
-} from '$/client/tv/schemas/transformers/TvSeasonDetails.schema';
-import { tmdb } from '$/utils/clients/tmdb';
-import { logger } from '$/utils/logger';
+import { tmdb } from '$/features/tmdb/general/utils/tmdbClient';
+import { TvDetailsSchema } from '$/features/tmdb/tv/schemas/transformers/TvDetails.schema';
+import { TvEpisodeDetailsSchema } from '$/features/tmdb/tv/schemas/transformers/TvEpisodeDetails.schema';
+import { TvSeasonDetailsSchema } from '$/features/tmdb/tv/schemas/transformers/TvSeasonDetails.schema';
 
 export const getCompleteTvDetails = async (id: string) => {
   const tv = await getTvDetails(id);
-  if (!tv) return undefined;
+  if (!tv.data) return { data: undefined, errors: [tv] };
 
-  const seasons = await Promise.all(tv.seasons.map((season) => getTvSeasonDetails(id, season.seasonNumber))).catch(
-    () => undefined,
+  const seasons = await Promise.all(
+    tv.data.seasons.map((season) => getTvSeasonDetails(id, season.seasonNumber)),
   );
 
-  if (!seasons || seasons.some((season) => !season)) return undefined;
+  if (seasons.some((season) => !season.data)) {
+    return { data: undefined, errors: seasons.filter((season) => !season.data) };
+  }
 
   const episodes = await Promise.all(
     seasons.flatMap((season) =>
-      season!.episodes.map((episode) => getTvEpisodeDetails(id, season!.seasonNumber, episode.episodeNumber)),
+      season.data!.episodes.map((episode) =>
+        getTvEpisodeDetails(id, season.data!.seasonNumber, episode.episodeNumber),
+      ),
     ),
-  ).catch(() => undefined);
+  );
 
-  if (!episodes || episodes.some((episode) => !episode)) return undefined;
+  if (episodes.some((episode) => !episode.data)) {
+    return { data: undefined, errors: episodes.filter((episode) => !episode.data) };
+  }
 
-  const allGuests = Array.from(
+  const guests = Array.from(
     new Map(
-      episodes.flatMap((episode) => episode!.credits.fullGuestsStars).map((guest) => [guest.id, guest]),
+      episodes
+        .flatMap((episode) => episode.data!.credits.fullGuestsStars ?? [])
+        .map((guest) => [guest.id, guest]),
     ).values(),
   );
 
   return {
-    ...tv,
-    credits: { ...tv.credits, guests: allGuests },
-    seasons: seasons.map((season) => ({
-      ...season!,
-      episodes: episodes
-        .filter((episode) => episode!.seasonNumber === season!.seasonNumber)
-        .map((episode) => {
-          // @ts-expect-error The type gets adjusted in the next line
-          delete episode!.credits.fullGuestsStars;
-          return episode;
-        }),
-    })),
+    data: {
+      ...tv.data,
+      credits: { ...tv.data.credits, guests },
+      seasons: seasons.map((season) => ({
+        ...season.data!,
+        episodes: episodes
+          .filter((episode) => episode.data!.seasonNumber === season.data!.seasonNumber)
+          .map((episode) => {
+            delete episode.data!.credits.fullGuestsStars;
+            return episode.data!;
+          }),
+      })),
+    },
+    errors: undefined,
   };
 };
 
-export const getTvDetails = async (id: string): Promise<TvDetails | undefined> => {
-  const res = await tmdb
-    .get(`tv/${id}`, {
-      params: {
-        language: 'de-DE',
-        append_to_response:
-          'alternative_titles,content_ratings,external_ids,images,keywords,translations,aggregate_credits',
-        include_image_language: 'de,en,null',
-      },
-    })
-    .catch(() => undefined);
-
-  const tv = TvDetailsSchema.safeParse(res?.data);
-
-  if (!tv.success) {
-    return logger.error('COULD_NOT_FETCH_TV_DETAILS', tv.error, { id });
-  }
-
-  return tv.data;
+export const getTvDetails = async (id: string) => {
+  const append =
+    'alternative_titles,content_ratings,external_ids,images,keywords,translations,aggregate_credits';
+  return tmdb(`tv/${id}`, { append_to_response: append }, TvDetailsSchema.safeParse);
 };
 
-export const getTvSeasonDetails = async (id: string, season: number): Promise<TvSeasonDetails | undefined> => {
-  const res = await tmdb
-    .get(`tv/${id}/season/${season}`, {
-      params: {
-        language: 'de-DE',
-        append_to_response: 'translations,external_ids,images,credits,videos',
-        include_image_language: 'de,en,null',
-        include_video_language: 'de,en,null',
-      },
-    })
-    .catch(() => undefined);
-
-  const tv = TvSeasonDetailsSchema.safeParse(res?.data);
-
-  if (!tv.success) {
-    return logger.error('COULD_NOT_FETCH_TV_SEASON_DETAILS', tv.error, { id });
-  }
-
-  return tv.data;
+export const getTvSeasonDetails = async (id: string, season: number) => {
+  return tmdb(
+    `tv/${id}/season/${season}`,
+    { append_to_response: 'translations,external_ids,images,credits,videos' },
+    TvSeasonDetailsSchema.safeParse,
+  );
 };
 
-export const getTvEpisodeDetails = async (
-  id: string,
-  season: number,
-  episode: number,
-): Promise<TvEpisodeDetails | undefined> => {
-  const res = await tmdb
-    .get(`tv/${id}/season/${season}/episode/${episode}`, {
-      params: {
-        language: 'de-DE',
-        append_to_response: 'images,translations,external_ids,credits',
-        include_image_language: 'de,en,null',
-      },
-    })
-    .catch(() => undefined);
-
-  const tv = TvEpisodeDetailsSchema.safeParse(res?.data);
-
-  if (!tv.success) {
-    return logger.error('COULD_NOT_FETCH_TV_EPISODE_DETAILS', tv.error, { id });
-  }
-
-  return tv.data;
+export const getTvEpisodeDetails = async (id: string, season: number, episode: number) => {
+  return tmdb(
+    `tv/${id}/season/${season}/episode/${episode}`,
+    { append_to_response: 'images,translations,external_ids,credits' },
+    TvEpisodeDetailsSchema.safeParse,
+  );
 };
