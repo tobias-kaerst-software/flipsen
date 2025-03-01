@@ -53,9 +53,9 @@ func main() {
 
 	r.Any("/*proxy", proxyHandler)
 
-	log.Println("Starting proxy server on :80")
+	log.Println("Starting proxy server on :8080")
 
-	if err := r.Run(":80"); err != nil {
+	if err := r.Run(":8080"); err != nil {
 		log.Fatal("Server failed to start:", err)
 	}
 }
