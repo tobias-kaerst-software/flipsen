@@ -3,9 +3,9 @@ import { existsSync, readdirSync } from 'fs';
 import { readFile } from 'fs/promises';
 import path from 'path';
 
-import type { MovieDetails } from '$/features/tmdb/movies/schemas/transformers/MovieDetails.schema';
+import type { MovieDetails } from '$/features/tmdb/features/movies/schemas/transformers/MovieDetails.schema';
 
-import { movieToBatchInput } from '$/features/tmdb/movies';
+import { movieToBatchInput } from '$/features/tmdb/features/movies';
 import { logger } from '$/utils/logger';
 import { promisesWithProgress } from '$/utils/utils';
 

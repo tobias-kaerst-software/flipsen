@@ -1,7 +1,7 @@
-import { tmdb } from '$/features/tmdb/general/utils/tmdbClient';
-import { TvDetailsSchema } from '$/features/tmdb/tv/schemas/transformers/TvDetails.schema';
-import { TvEpisodeDetailsSchema } from '$/features/tmdb/tv/schemas/transformers/TvEpisodeDetails.schema';
-import { TvSeasonDetailsSchema } from '$/features/tmdb/tv/schemas/transformers/TvSeasonDetails.schema';
+import { tmdb } from '$/features/tmdb/lib/http';
+import { TvDetailsSchema } from '$/features/tmdb/features/tv/schemas/transformers/TvDetails.schema';
+import { TvEpisodeDetailsSchema } from '$/features/tmdb/features/tv/schemas/transformers/TvEpisodeDetails.schema';
+import { TvSeasonDetailsSchema } from '$/features/tmdb/features/tv/schemas/transformers/TvSeasonDetails.schema';
 
 export const getCompleteTvDetails = async (id: string) => {
   const tv = await getTvDetails(id);

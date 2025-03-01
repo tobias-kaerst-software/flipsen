@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-import { TmdbAlternativeTitlesSchema } from '$/features/tmdb/general/schemas/TmdbAlternativeTitles.schema';
-import { TmdbBasicPersonSchema } from '$/features/tmdb/general/schemas/TmdbBasicPerson.schema';
-import { TmdbImagesSchema } from '$/features/tmdb/general/schemas/TmdbImage.schema';
-import { TmdbProductionCompaniesSchema } from '$/features/tmdb/general/schemas/TmdbProductionCompanies.schema';
-import { TmdbVideosSchema } from '$/features/tmdb/general/schemas/TmdbVideo.schema';
+import { TmdbAlternativeTitlesSchema } from '$/features/tmdb/schemas/TmdbAlternativeTitles.schema';
+import { TmdbBasicPersonSchema } from '$/features/tmdb/schemas/TmdbBasicPerson.schema';
+import { TmdbImagesSchema } from '$/features/tmdb/schemas/TmdbImage.schema';
+import { TmdbProductionCompaniesSchema } from '$/features/tmdb/schemas/TmdbProductionCompanies.schema';
+import { TmdbVideosSchema } from '$/features/tmdb/schemas/TmdbVideo.schema';
 
 export const TmdbMovieDetailsSchema = z.object({
   id: z.number(),

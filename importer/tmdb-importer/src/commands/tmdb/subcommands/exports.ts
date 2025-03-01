@@ -2,9 +2,9 @@ import { Command } from 'commander';
 import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
 
-import type { TmdbExportType } from '$/features/tmdb/general/downloadDailyExports';
+import type { TmdbExportType } from '$/features/tmdb/features/downloadDailyExports';
 
-import { downloadDailyExport, downloadDailyExports } from '$/features/tmdb/general/downloadDailyExports';
+import { downloadDailyExport, downloadDailyExports } from '$/features/tmdb/features/downloadDailyExports';
 import { logger } from '$/utils/logger';
 
 export const dailyExportsCommand = new Command()

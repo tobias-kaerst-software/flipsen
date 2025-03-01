@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { TmdbImagesSchema } from '$/features/tmdb/general/schemas/TmdbImage.schema';
-import { TmdbVideosSchema } from '$/features/tmdb/general/schemas/TmdbVideo.schema';
+import { TmdbImagesSchema } from '$/features/tmdb/schemas/TmdbImage.schema';
+import { TmdbVideosSchema } from '$/features/tmdb/schemas/TmdbVideo.schema';
 
 export const RawTvSeasonDetailsSchema = z.object({
   id: z.number(),

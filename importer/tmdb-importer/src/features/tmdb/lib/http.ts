@@ -5,8 +5,13 @@ import axios from 'axios';
 import rateLimit from 'axios-rate-limit';
 
 import { env } from '$/config';
-import { tmdbDefaultParams } from '$/features/tmdb/general/utils/tmdbDefaultParams';
 import { logger } from '$/utils/logger';
+
+export const tmdbDefaultParams = {
+  language: 'de-DE',
+  include_image_language: 'de,en,null',
+  include_video_language: 'de,en,null',
+};
 
 const client1 = rateLimit(
   axios.create({

@@ -4,8 +4,8 @@ import PQueue from 'p-queue';
 import path from 'path';
 import readline from 'readline';
 
-import { getMovieDetailsById } from '$/features/tmdb/movies';
-import { getCompleteTvDetails } from '$/features/tmdb/tv';
+import { getMovieDetailsById } from '$/features/tmdb/features/movies';
+import { getCompleteTvDetails } from '$/features/tmdb/features/tv';
 
 export const downloadCommand = new Command()
   .command('download')

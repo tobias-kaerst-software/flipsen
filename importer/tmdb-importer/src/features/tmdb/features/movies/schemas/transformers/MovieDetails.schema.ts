@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 
-import { TmdbMovieDetailsSchema } from '$/features/tmdb/movies/schemas/TmdbMovieDetails.schema';
+import { TmdbMovieDetailsSchema } from '$/features/tmdb/features/movies/schemas/TmdbMovieDetails.schema';
 
 export const MovieDetailsSchema = TmdbMovieDetailsSchema.transform((data) => ({
   id: String(data.id),

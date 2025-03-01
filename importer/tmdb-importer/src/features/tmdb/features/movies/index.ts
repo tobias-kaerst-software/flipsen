@@ -1,8 +1,8 @@
-import { tmdb } from '$/features/tmdb/general/utils/tmdbClient';
 import {
   type MovieDetails,
   MovieDetailsSchema,
-} from '$/features/tmdb/movies/schemas/transformers/MovieDetails.schema';
+} from '$/features/tmdb/features/movies/schemas/transformers/MovieDetails.schema';
+import { tmdb } from '$/features/tmdb/lib/http';
 
 export const getMovieDetailsById = async (id: string) => {
   const append = 'alternative_titles,keywords,translations,images,release_dates,credits,external_ids,videos';

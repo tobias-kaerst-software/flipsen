@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 
-import { RawTvDetailsSchema } from '$/features/tmdb/tv/schemas/RawTvDetails.schema';
+import { RawTvDetailsSchema } from '$/features/tmdb/features/tv/schemas/RawTvDetails.schema';
 
 export const TvDetailsSchema = RawTvDetailsSchema.transform((data) => ({
   id: String(data.id),
@@ -39,7 +39,10 @@ export const TvDetailsSchema = RawTvDetailsSchema.transform((data) => ({
 
   translations: data.translations.translations
     .reduce<typeof data.translations.translations>((acc, translation) => {
-      if (!acc.some((item) => item.iso_639_1 === translation.iso_639_1) && ['en'].includes(translation.iso_639_1))
+      if (
+        !acc.some((item) => item.iso_639_1 === translation.iso_639_1) &&
+        ['en'].includes(translation.iso_639_1)
+      )
         acc.push(translation);
       return acc;
     }, [])
@@ -104,7 +107,11 @@ export const TvDetailsSchema = RawTvDetailsSchema.transform((data) => ({
       popularity: cast.popularity,
       profilePath: cast.profile_path,
       department: cast.department,
-      jobs: cast.jobs.map((job) => ({ job: job.job, episodeCount: job.episode_count, creditId: job.credit_id })),
+      jobs: cast.jobs.map((job) => ({
+        job: job.job,
+        episodeCount: job.episode_count,
+        creditId: job.credit_id,
+      })),
     })),
   },
 

@@ -1,15 +1,19 @@
 import type { z } from 'zod';
 
-import { RawTvSeasonDetailsSchema } from '$/features/tmdb/tv/schemas/RawTvSeasonDetails.schema';
+import { RawTvEpisodeDetailsSchema } from '$/features/tmdb/features/tv/schemas/RawTvEpisodeDetails.schema';
 
-export const TvSeasonDetailsSchema = RawTvSeasonDetailsSchema.transform((data) => ({
+export const TvEpisodeDetailsSchema = RawTvEpisodeDetailsSchema.transform((data) => ({
   id: String(data.id),
   seasonNumber: data.season_number,
+  episodeNumber: data.episode_number,
 
   name: data.name,
   overview: data.overview,
   firstAirDate: data.air_date,
   voteAverage: data.vote_average,
+  voteCount: data.vote_count,
+  productionCode: data.production_code,
+  runtime: data.runtime,
 
   images: data.images,
 
@@ -31,6 +35,7 @@ export const TvSeasonDetailsSchema = RawTvSeasonDetailsSchema.transform((data) =
     })),
 
   externalIds: {
+    imdbId: data.external_ids.imdb_id,
     freebaseMid: data.external_ids.freebase_mid,
     freebaseId: data.external_ids.freebase_id,
     tvdbId: data.external_ids.tvdb_id,
@@ -41,13 +46,21 @@ export const TvSeasonDetailsSchema = RawTvSeasonDetailsSchema.transform((data) =
   credits: {
     cast: data.credits.cast.map((cast) => cast.credit_id),
     crew: data.credits.crew.map((crew) => crew.credit_id),
+    guestStars: data.credits.guest_stars?.map((guest) => guest.credit_id) ?? [],
+    fullGuestsStars: data.credits.guest_stars?.map((guest) => ({
+      adult: guest.adult,
+      gender: guest.gender,
+      id: guest.id,
+      knownForDepartment: guest.known_for_department,
+      name: guest.name,
+      originalName: guest.original_name,
+      popularity: guest.popularity,
+      profilePath: guest.profile_path,
+      character: guest.character,
+      creditId: guest.credit_id,
+      order: guest.order,
+    })),
   },
-
-  videos: data.videos.results,
-
-  episodes: data.episodes.map((episode) => ({
-    episodeNumber: episode.episode_number,
-  })),
 }));
 
-export type TvSeasonDetails = z.infer<typeof TvSeasonDetailsSchema>;
+export type TvEpisodeDetails = z.infer<typeof TvEpisodeDetailsSchema>;
