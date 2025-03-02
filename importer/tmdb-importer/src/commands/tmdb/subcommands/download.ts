@@ -4,6 +4,7 @@ import PQueue from 'p-queue';
 import path from 'path';
 import readline from 'readline';
 
+import { getCollectionDetails } from '$/features/tmdb/features/collections';
 import { getMovieDetailsById } from '$/features/tmdb/features/movies';
 import { getCompleteTvDetails } from '$/features/tmdb/features/tv';
 import { logger } from '$/utils/logger';
@@ -11,10 +12,10 @@ import { logger } from '$/utils/logger';
 export const downloadCommand = new Command()
   .command('download')
   .description('Download all movies from given ids as json files to the output directory.')
-  .argument('<movie | tv>', 'Type of data to download from the api')
+  .argument('<movie | tv | collections>', 'Type of data to download from the api')
   .requiredOption('--input-file, -i <string>', 'Input file with movie ids')
   .option('--out-dir, -o <string>', 'Output directory', '.')
-  .action(async (type: 'movie' | 'tv', options: { inputFile: string; outDir: string }) => {
+  .action(async (type: 'collections' | 'movie' | 'tv', options: { inputFile: string; outDir: string }) => {
     const filePath = path.resolve(options.outDir, 'files');
     const errorPath = path.resolve(options.outDir, 'logs', String(Date.now()));
 
@@ -58,6 +59,15 @@ export const downloadCommand = new Command()
 
             if (has404) missingIds.push(id);
             else if (!data) erroredIds.push(id);
+
+            return data;
+          }
+
+          if (type === 'collections') {
+            const { data, status } = await getCollectionDetails(id);
+
+            if (status === 404) missingIds.push(id);
+            else if (status !== 200) erroredIds.push(id);
 
             return data;
           }
