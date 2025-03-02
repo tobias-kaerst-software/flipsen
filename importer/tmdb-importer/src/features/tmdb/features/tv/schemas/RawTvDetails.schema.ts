@@ -26,7 +26,7 @@ export const RawTvDetailsSchema = z.object({
   origin_country: z.array(z.string()),
   languages: z.array(z.string()),
 
-  number_of_episodes: z.number(),
+  number_of_episodes: z.number().nullable(),
   number_of_seasons: z.number(),
   in_production: z.boolean(),
 
@@ -83,28 +83,31 @@ export const RawTvDetailsSchema = z.object({
     ),
   }),
 
-  aggregate_credits: z.object({
-    cast: z.array(
-      z
-        .object({
-          roles: z.array(
-            z.object({ character: z.string(), episode_count: z.number(), credit_id: z.string() }),
-          ),
-          total_episode_count: z.number(),
-          order: z.number(),
-        })
-        .and(TmdbBasicPersonSchema),
-    ),
-    crew: z.array(
-      z
-        .object({
-          total_episode_count: z.number(),
-          jobs: z.array(z.object({ job: z.string(), episode_count: z.number(), credit_id: z.string() })),
-          department: z.string(),
-        })
-        .and(TmdbBasicPersonSchema),
-    ),
-  }),
+  aggregate_credits: z
+    .object({
+      cast: z.array(
+        z
+          .object({
+            roles: z.array(
+              z.object({ character: z.string(), episode_count: z.number(), credit_id: z.string() }),
+            ),
+            total_episode_count: z.number(),
+            order: z.number(),
+          })
+          .and(TmdbBasicPersonSchema),
+      ),
+      crew: z.array(
+        z
+          .object({
+            total_episode_count: z.number(),
+            jobs: z.array(z.object({ job: z.string(), episode_count: z.number(), credit_id: z.string() })),
+            department: z.string(),
+          })
+          .and(TmdbBasicPersonSchema),
+      ),
+    })
+    .optional()
+    .default({ cast: [], crew: [] }),
 
-  seasons: z.array(z.object({ season_number: z.number() })),
+  seasons: z.array(z.object({ season_number: z.number(), episode_count: z.number() })),
 });

@@ -1,6 +1,7 @@
 import type { z } from 'zod';
 
 import { RawTvDetailsSchema } from '$/features/tmdb/features/tv/schemas/RawTvDetails.schema';
+import { supportedTranslations } from '$/features/tmdb/lib/http';
 
 export const TvDetailsSchema = RawTvDetailsSchema.transform((data) => ({
   id: String(data.id),
@@ -23,7 +24,8 @@ export const TvDetailsSchema = RawTvDetailsSchema.transform((data) => ({
   originCountry: data.origin_country,
   languages: data.languages,
 
-  number_of_episodes: data.number_of_episodes,
+  number_of_episodes:
+    data.number_of_episodes ?? data.seasons.reduce((acc, season) => acc + season.episode_count, 0),
   number_of_seasons: data.number_of_seasons,
   in_production: data.in_production,
 
@@ -41,7 +43,7 @@ export const TvDetailsSchema = RawTvDetailsSchema.transform((data) => ({
     .reduce<typeof data.translations.translations>((acc, translation) => {
       if (
         !acc.some((item) => item.iso_639_1 === translation.iso_639_1) &&
-        ['en'].includes(translation.iso_639_1)
+        supportedTranslations.includes(translation.iso_639_1)
       )
         acc.push(translation);
       return acc;

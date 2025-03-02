@@ -1,7 +1,7 @@
-import { tmdb } from '$/features/tmdb/lib/http';
 import { TvDetailsSchema } from '$/features/tmdb/features/tv/schemas/transformers/TvDetails.schema';
 import { TvEpisodeDetailsSchema } from '$/features/tmdb/features/tv/schemas/transformers/TvEpisodeDetails.schema';
 import { TvSeasonDetailsSchema } from '$/features/tmdb/features/tv/schemas/transformers/TvSeasonDetails.schema';
+import { tmdb } from '$/features/tmdb/lib/http';
 
 export const getCompleteTvDetails = async (id: string) => {
   const tv = await getTvDetails(id);
@@ -23,14 +23,16 @@ export const getCompleteTvDetails = async (id: string) => {
     ),
   );
 
-  if (episodes.some((episode) => !episode.data)) {
-    return { data: undefined, errors: episodes.filter((episode) => !episode.data) };
+  const episodeErrors = episodes.filter((episode) => !episode.data).map((episode) => episode.status);
+
+  if (episodeErrors.length > 0 && !episodeErrors.every((error) => error === 404)) {
+    return { data: undefined, errors: episodes.filter((episode) => !episode!.data) };
   }
 
   const guests = Array.from(
     new Map(
       episodes
-        .flatMap((episode) => episode.data!.credits.fullGuestsStars ?? [])
+        .flatMap((episode) => episode?.data?.credits.fullGuestsStars ?? [])
         .map((guest) => [guest.id, guest]),
     ).values(),
   );
@@ -39,15 +41,25 @@ export const getCompleteTvDetails = async (id: string) => {
     data: {
       ...tv.data,
       credits: { ...tv.data.credits, guests },
-      seasons: seasons.map((season) => ({
-        ...season.data!,
-        episodes: episodes
-          .filter((episode) => episode.data!.seasonNumber === season.data!.seasonNumber)
+      seasons: seasons.map((season) => {
+        const seasonEps = episodes
+          .filter((episode) => episode.data?.seasonNumber === season.data!.seasonNumber)
           .map((episode) => {
             delete episode.data!.credits.fullGuestsStars;
             return episode.data!;
-          }),
-      })),
+          });
+
+        for (const undetailedEpisode of season.data!.episodes) {
+          if (!seasonEps.some((episode) => episode.episodeNumber === undetailedEpisode.episodeNumber)) {
+            delete undetailedEpisode.credits.fullGuestsStars;
+            seasonEps.push(undetailedEpisode);
+          }
+        }
+
+        seasonEps.sort((a, b) => a.episodeNumber - b.episodeNumber);
+
+        return { ...season.data!, episodes: seasonEps };
+      }),
     },
     errors: undefined,
   };
@@ -72,5 +84,6 @@ export const getTvEpisodeDetails = async (id: string, season: number, episode: n
     `tv/${id}/season/${season}/episode/${episode}`,
     { append_to_response: 'images,translations,external_ids,credits' },
     TvEpisodeDetailsSchema.safeParse,
+    true,
   );
 };

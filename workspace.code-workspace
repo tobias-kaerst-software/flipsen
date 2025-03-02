@@ -20,7 +20,7 @@
     "workbench.editor.labelFormat": "short",
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.expand": false,
-
+    "explorer.autoReveal": false,
     "files.associations": {
       "*.css": "tailwindcss"
     }

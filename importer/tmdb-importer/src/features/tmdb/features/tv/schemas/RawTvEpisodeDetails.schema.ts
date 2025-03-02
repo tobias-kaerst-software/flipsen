@@ -18,17 +18,20 @@ export const RawTvEpisodeDetailsSchema = z.object({
 
   images: TmdbImagesSchema,
 
-  translations: z.object({
-    translations: z.array(
-      z.object({
-        iso_639_1: z.string(),
-        data: z.object({
-          overview: z.string(),
-          name: z.string(),
+  translations: z
+    .object({
+      translations: z.array(
+        z.object({
+          iso_639_1: z.string(),
+          data: z.object({
+            overview: z.string().nullable().default(''),
+            name: z.string().nullable().default(''),
+          }),
         }),
-      }),
-    ),
-  }),
+      ),
+    })
+    .optional()
+    .default({ translations: [] }),
 
   external_ids: z.object({
     imdb_id: z.string().nullable(),

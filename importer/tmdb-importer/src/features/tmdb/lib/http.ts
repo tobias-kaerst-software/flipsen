@@ -7,35 +7,28 @@ import rateLimit from 'axios-rate-limit';
 import { env } from '$/config';
 import { logger } from '$/utils/logger';
 
+export const supportedTranslations = ['de'];
+
 export const tmdbDefaultParams = {
-  language: 'de-DE',
+  language: 'en-US',
   include_image_language: 'de,en,null',
   include_video_language: 'de,en,null',
 };
 
-const client1 = rateLimit(
-  axios.create({
-    baseURL: 'http://dev-linux-app.azurewebsites.net/3',
-    headers: {
-      Authorization: `Bearer ${env.TMDB_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-  }),
-  { maxRequests: 40, perMilliseconds: 1000 },
-);
+const proxyUrls = ['https://api.themoviedb.org/3'];
 
-const client2 = rateLimit(
-  axios.create({
-    baseURL: 'https://api.themoviedb.org/3',
-    headers: {
-      Authorization: `Bearer ${env.TMDB_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-  }),
-  { maxRequests: 40, perMilliseconds: 1000 },
+const clients = proxyUrls.map((url) =>
+  rateLimit(
+    axios.create({
+      baseURL: url,
+      headers: {
+        Authorization: `Bearer ${env.TMDB_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    }),
+    { maxRequests: 40, perMilliseconds: 1000 },
+  ),
 );
-
-// client.interceptors.request.use(AxiosLogger.requestLogger);
 
 let requestCounter = 0;
 
@@ -43,13 +36,14 @@ export const tmdb = async <I, O>(
   url: string,
   params: Record<string, string>,
   parser: (data: unknown) => SafeParseReturnType<I, O>,
+  skipFetchErrorLogging = false,
 ) => {
-  const client = requestCounter++ % 2 === 0 ? client1 : client2;
+  const client = clients[requestCounter++ % clients.length];
 
   const res = await client
     .get(url, { params: { ...tmdbDefaultParams, ...params } })
     .catch((e: AxiosError) => {
-      logger.error('could_not_fetch', e, { url });
+      logger.error('could_not_fetch', e, { url }, skipFetchErrorLogging);
       return e.status ?? 500;
     });
 

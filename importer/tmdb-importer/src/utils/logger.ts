@@ -11,9 +11,12 @@ const consoleWriter: Writer = {
 };
 
 export const logger = {
-  error: (msg: string, error: object, payload?: object) => {
+  error: (msg: string, error: object, payload?: object, skipFetchErrorLogging = false) => {
     consoleWriter.write(red(`ERROR: ${msg}`) + '\n' + JSON.stringify({ error, payload }, null, 2));
+
+    if (skipFetchErrorLogging) return undefined;
     Bun.write(`errors/${Date.now()}.log`, JSON.stringify({ msg, error, payload }, null, 2));
+
     return undefined;
   },
   info: (msg: string, payload?: object) => {

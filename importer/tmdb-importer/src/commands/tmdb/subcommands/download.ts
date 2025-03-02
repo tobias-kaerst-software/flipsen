@@ -6,6 +6,7 @@ import readline from 'readline';
 
 import { getMovieDetailsById } from '$/features/tmdb/features/movies';
 import { getCompleteTvDetails } from '$/features/tmdb/features/tv';
+import { logger } from '$/utils/logger';
 
 export const downloadCommand = new Command()
   .command('download')
@@ -36,6 +37,10 @@ export const downloadCommand = new Command()
       const json = JSON.parse(line) as { id: number };
       const id = String(json.id);
 
+      if (existsSync(path.resolve(filePath, `${json.id}.json`))) {
+        return logger.debug(`Skipping ${json.id}.json file`);
+      }
+
       queue.add(async () => {
         const downloadFunction = async () => {
           if (type === 'movie') {
@@ -49,7 +54,7 @@ export const downloadCommand = new Command()
 
           if (type === 'tv') {
             const { data, errors } = await getCompleteTvDetails(id);
-            const has404 = errors?.some((err) => err.status === 404);
+            const has404 = errors?.some((err) => err?.status === 404);
 
             if (has404) missingIds.push(id);
             else if (!data) erroredIds.push(id);
@@ -61,6 +66,18 @@ export const downloadCommand = new Command()
         };
 
         const data = await downloadFunction();
+
+        if (!data) {
+          Bun.write(
+            path.resolve(errorPath, 'errored_ids.json'),
+            erroredIds.map((id) => `{ "id": ${id} }`).join('\n'),
+          );
+
+          Bun.write(
+            path.resolve(errorPath, 'missing_ids.json'),
+            missingIds.map((id) => `{ "id": ${id} }`).join('\n'),
+          );
+        }
 
         if (data) {
           Bun.write(path.resolve(filePath, `${json.id}.json`), JSON.stringify(data, null, 2));
