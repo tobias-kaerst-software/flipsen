@@ -21,8 +21,8 @@ export const RawTvSeasonDetailsSchema = z.object({
         z.object({
           iso_639_1: z.string(),
           data: z.object({
-            overview: z.string(),
-            name: z.string(),
+            overview: z.string().nullable().default(''),
+            name: z.string().nullable().default(''),
           }),
         }),
       ),

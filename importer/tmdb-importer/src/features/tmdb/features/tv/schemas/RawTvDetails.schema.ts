@@ -45,10 +45,10 @@ export const RawTvDetailsSchema = z.object({
       z.object({
         iso_639_1: z.string(),
         data: z.object({
-          homepage: z.string(),
-          overview: z.string(),
-          tagline: z.string(),
-          name: z.string(),
+          homepage: z.string().nullable().default(''),
+          overview: z.string().nullable().default(''),
+          tagline: z.string().nullable().default(''),
+          name: z.string().nullable().default(''),
         }),
       }),
     ),
