@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "infisical run -- bun run src/index.ts"
+    "dev": "infisical run -- bun run src/index.ts",
+    "build": "bun build src/index.ts --target bun --outfile dist/cli.js --minify"
   },
   "dependencies": {
     "axios": "^1.8.1",

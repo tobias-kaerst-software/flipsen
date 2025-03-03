@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { supportedTranslations } from '$/features/tmdb/lib/http';
-import { TmdbImagesSchema } from '$/features/tmdb/schemas/TmdbImage.schema';
+import { filterImages, TmdbImageSchema } from '$/features/tmdb/schemas/TmdbImage.schema';
 
 export const CollectionDetailsSchema = z
   .object({
@@ -14,44 +14,56 @@ export const CollectionDetailsSchema = z
         z.object({
           iso_639_1: z.string(),
           data: z.object({
-            homepage: z.string().nullable(),
-            overview: z.string().nullable(),
-            title: z.string().nullable(),
+            homepage: z.string().nullable().default(''),
+            overview: z.string().nullable().default(''),
+            title: z.string().nullable().default(''),
           }),
         }),
       ),
     }),
 
-    images: TmdbImagesSchema,
+    images: z
+      .object({
+        backdrops: z.array(TmdbImageSchema).optional().default([]),
+        posters: z.array(TmdbImageSchema).optional().default([]),
+      })
+      .optional()
+      .default({ backdrops: [], posters: [] }),
 
     parts: z.array(z.object({ id: z.number(), media_type: z.literal('movie').or(z.literal('collection')) })),
   })
   .transform((data) => ({
-    id: String(data.id),
-    name: data.name,
-    overview: data.overview,
+    static: {
+      id: String(data.id),
 
-    translations: data.translations.translations
-      .reduce<typeof data.translations.translations>((acc, translation) => {
-        if (
-          !acc.some((item) => item.iso_639_1 === translation.iso_639_1) &&
-          supportedTranslations.includes(translation.iso_639_1)
-        )
-          acc.push(translation);
-        return acc;
-      }, [])
-      .map((translation) => ({
-        language: translation.iso_639_1,
-        data: {
-          ...(translation.data.homepage ? { homepage: translation.data.homepage } : {}),
-          ...(translation.data.overview ? { overview: translation.data.overview } : {}),
-          ...(translation.data.title ? { title: translation.data.title } : {}),
-        },
-      })),
+      name: data.name,
+      overview: data.overview,
 
-    image: data.images,
+      translations: data.translations.translations.reduce<
+        Record<string, { homepage?: string; overview?: string; title?: string }>
+      >((acc, trans) => {
+        if (trans.iso_639_1 in acc || !supportedTranslations.includes(trans.iso_639_1)) return acc;
 
-    parts: data.parts
-      .filter((part) => part.id !== data.id)
-      .map((part) => ({ id: String(part.id), mediaType: part.media_type })),
+        return {
+          ...acc,
+          [trans.iso_639_1]: {
+            ...(trans.data.homepage ? { homepage: trans.data.homepage } : {}),
+            ...(trans.data.overview ? { overview: trans.data.overview } : {}),
+            ...(trans.data.title ? { title: trans.data.title } : {}),
+          },
+        };
+      }, {}),
+
+      images: {
+        backdrops: filterImages(data.images.backdrops),
+        posters: filterImages(data.images.posters),
+      },
+
+      movies: data.parts.filter((part) => part.media_type === 'movie').map((part) => String(part.id)),
+      collections: data.parts
+        .filter((part) => part.media_type === 'collection')
+        .map((part) => String(part.id)),
+    },
   }));
+
+export type CollectionDetails = z.infer<typeof CollectionDetailsSchema>;

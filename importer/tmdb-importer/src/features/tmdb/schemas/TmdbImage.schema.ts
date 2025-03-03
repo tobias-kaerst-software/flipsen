@@ -10,6 +10,20 @@ export const TmdbImageSchema = z.object({
   file_path: z.string(),
 });
 
+export const filterImages = (images: z.infer<typeof TmdbImageSchema>[]) => {
+  return images
+    .reduce<typeof images>((acc, backdrop) => {
+      if (!acc.some((item) => item.iso_639_1 === backdrop.iso_639_1)) acc.push(backdrop);
+      return acc;
+    }, [])
+    .map((backdrop) => ({
+      lang: backdrop.iso_639_1,
+      width: backdrop.width,
+      height: backdrop.height,
+      path: backdrop.file_path,
+    }));
+};
+
 export const TmdbImagesSchema = z
   .object({
     backdrops: z.array(TmdbImageSchema).optional().default([]),

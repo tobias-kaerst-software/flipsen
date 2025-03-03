@@ -1,10 +1,10 @@
 import {
   type MovieDetails,
   MovieDetailsSchema,
-} from '$/features/tmdb/features/movies/schemas/transformers/MovieDetails.schema';
+} from '$/features/tmdb/features/movies/schemas/MovieDetails.schema';
 import { tmdb } from '$/features/tmdb/lib/http';
 
-export const getMovieDetailsById = async (id: string) => {
+export const getMovieDetails = async (id: string) => {
   const append = 'alternative_titles,keywords,translations,images,release_dates,credits,external_ids,videos';
   return tmdb(`movie/${id}`, { append_to_response: append }, MovieDetailsSchema.safeParse);
 };
