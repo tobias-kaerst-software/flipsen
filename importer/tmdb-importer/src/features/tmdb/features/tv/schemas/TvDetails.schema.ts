@@ -97,82 +97,86 @@ export const TvDetailsSchema = z
     seasons: z.array(z.object({ id: z.number(), season_number: z.number(), episode_count: z.number() })),
   })
   .transform((data) => ({
-    id: String(data.id),
-
-    name: data.name,
-    originalName: data.original_name,
-    alternativeTitles: data.alternative_titles.results.reduce<Record<string, string>>((acc, title) => {
-      return title.iso_3166_1 in acc ? acc : { ...acc, [title.iso_3166_1]: title.title };
-    }, {}),
-
-    overview: data.overview,
-    tagline: data.tagline,
-    homepage: data.homepage,
-    type: data.type,
-
-    originCountry: data.origin_country,
-    originalLanguage: data.original_language,
-    spokenLanguages: data.spoken_languages.map((language) => language.iso_639_1),
-    languages: data.languages,
-
-    firstAirDate: data.first_air_date,
-    lastAirDate: data.last_air_date,
-    status: data.status,
-    inProduction: data.in_production,
-
-    voteAverage: data.vote_average,
-    voteCount: data.vote_count,
-    popularity: data.popularity,
-
-    genres: data.genres.map((genre) => genre.name),
-    keywords: data.keywords.results.map((keyword) => keyword.name),
-
-    productionCountries: data.production_countries.map((country) => country.iso_3166_1),
-    productionCompanies: data.production_companies.map((company) => company.id),
-
-    externalIds: {
-      imdbId: data.external_ids.imdb_id,
-      freebaseMid: data.external_ids.freebase_mid,
-      freebaseId: data.external_ids.freebase_id,
-      tvdbId: data.external_ids.tvdb_id,
-      wikidataId: data.external_ids.wikidata_id,
-      facebookId: data.external_ids.facebook_id,
-      instagramId: data.external_ids.instagram_id,
-      twitterId: data.external_ids.twitter_id,
+    dynamic: {
+      voteAverage: data.vote_average,
+      voteCount: data.vote_count,
+      popularity: data.popularity,
     },
 
-    images: {
-      backdrops: filterImages(data.images.backdrops),
-      logos: filterImages(data.images.logos),
-      posters: filterImages(data.images.posters),
+    static: {
+      id: String(data.id),
+
+      name: data.name,
+      originalName: data.original_name,
+      alternativeTitles: data.alternative_titles.results.reduce<Record<string, string>>((acc, title) => {
+        return title.iso_3166_1 in acc ? acc : { ...acc, [title.iso_3166_1]: title.title };
+      }, {}),
+
+      overview: data.overview,
+      tagline: data.tagline,
+      homepage: data.homepage,
+      type: data.type,
+
+      originCountry: data.origin_country,
+      originalLanguage: data.original_language,
+      spokenLanguages: data.spoken_languages.map((language) => language.iso_639_1),
+      languages: data.languages,
+
+      firstAirDate: data.first_air_date,
+      lastAirDate: data.last_air_date,
+      status: data.status,
+      inProduction: data.in_production,
+
+      genres: data.genres.map((genre) => genre.name),
+      keywords: data.keywords.results.map((keyword) => keyword.name),
+
+      productionCountries: data.production_countries.map((country) => country.iso_3166_1),
+      productionCompanies: data.production_companies.map((company) => company.id),
+
+      externalIds: {
+        imdbId: data.external_ids.imdb_id,
+        freebaseMid: data.external_ids.freebase_mid,
+        freebaseId: data.external_ids.freebase_id,
+        tvdbId: data.external_ids.tvdb_id,
+        wikidataId: data.external_ids.wikidata_id,
+        facebookId: data.external_ids.facebook_id,
+        instagramId: data.external_ids.instagram_id,
+        twitterId: data.external_ids.twitter_id,
+      },
+
+      images: {
+        backdrops: filterImages(data.images.backdrops),
+        logos: filterImages(data.images.logos),
+        posters: filterImages(data.images.posters),
+      },
+
+      networks: data.networks.map((network) => String(network.id)),
+
+      contentRatings: data.content_ratings.results.reduce<Record<string, string>>((acc, rating) => {
+        return rating.iso_3166_1 in acc ? acc : { ...acc, [rating.iso_3166_1]: rating.rating };
+      }, {}),
+
+      translations: data.translations.translations.reduce<
+        Record<string, { homepage?: string; name?: string; overview?: string; tagline?: string }>
+      >((acc, trans) => {
+        if (trans.iso_639_1 in acc || !supportedTranslations.includes(trans.iso_639_1)) return acc;
+
+        return {
+          ...acc,
+          [trans.iso_639_1]: {
+            ...(trans.data.name ? { name: trans.data.name } : {}),
+            ...(trans.data.overview ? { overview: trans.data.overview } : {}),
+            ...(trans.data.tagline ? { tagline: trans.data.tagline } : {}),
+            ...(trans.data.homepage ? { homepage: trans.data.homepage } : {}),
+          },
+        };
+      }, {}),
+
+      seasons: data.seasons.map((season) => ({
+        id: String(season.id),
+        seasonNumber: season.season_number,
+      })),
     },
-
-    networks: data.networks.map((network) => String(network.id)),
-
-    contentRatings: data.content_ratings.results.reduce<Record<string, string>>((acc, rating) => {
-      return rating.iso_3166_1 in acc ? acc : { ...acc, [rating.iso_3166_1]: rating.rating };
-    }, {}),
-
-    translations: data.translations.translations.reduce<
-      Record<string, { homepage?: string; name?: string; overview?: string; tagline?: string }>
-    >((acc, trans) => {
-      if (trans.iso_639_1 in acc || !supportedTranslations.includes(trans.iso_639_1)) return acc;
-
-      return {
-        ...acc,
-        [trans.iso_639_1]: {
-          ...(trans.data.name ? { name: trans.data.name } : {}),
-          ...(trans.data.overview ? { overview: trans.data.overview } : {}),
-          ...(trans.data.tagline ? { tagline: trans.data.tagline } : {}),
-          ...(trans.data.homepage ? { homepage: trans.data.homepage } : {}),
-        },
-      };
-    }, {}),
-
-    seasons: data.seasons.map((season) => ({
-      id: String(season.id),
-      seasonNumber: season.season_number,
-    })),
   }));
 
 export type TvDetails = z.infer<typeof TvDetailsSchema>;

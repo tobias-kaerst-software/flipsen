@@ -200,14 +200,8 @@ export const MovieDetailsSchema = z
       credits: {
         cast: data.credits.cast
           .sort((a, b) => a.order - b.order)
-          .map((cast) => ({
-            id: String(cast.id),
-            creditId: cast.credit_id,
-          })),
-        crew: data.credits.crew.map((cast) => ({
-          id: String(cast.id),
-          creditId: cast.credit_id,
-        })),
+          .map((cast) => `${cast.id}-${cast.credit_id}`),
+        crew: data.credits.crew.map((cast) => `${cast.id}-${cast.credit_id}`),
       },
     },
   }));

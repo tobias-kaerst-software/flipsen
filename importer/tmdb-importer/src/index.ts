@@ -27,5 +27,5 @@ program.parse();
 // const movie = await getMovieDetails('693134');
 // Bun.write('movie.json', JSON.stringify(movie, null, 2));
 
-// const tv = await getCompleteTvDetails('62');
+// const tv = await getCompleteTvDetails('1399');
 // Bun.write('tv.json', JSON.stringify(tv, null, 2));

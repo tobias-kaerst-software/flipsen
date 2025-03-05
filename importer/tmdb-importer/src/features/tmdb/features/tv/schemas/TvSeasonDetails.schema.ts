@@ -79,31 +79,34 @@ export const TvSeasonDetailsSchema = z
     ),
   })
   .transform((data) => ({
-    id: String(data.id),
-    seasonNumber: data.season_number,
-
-    name: data.name,
-    overview: data.overview,
-    firstAirDate: data.air_date,
-
-    voteAverage: data.vote_average,
-
-    externalIds: {
-      freebaseMid: data.external_ids.freebase_mid,
-      freebaseId: data.external_ids.freebase_id,
-      tvdbId: data.external_ids.tvdb_id,
-      tvrageId: data.external_ids.tvrage_id,
-      wikidataId: data.external_ids.wikidata_id,
+    dynamic: {
+      voteAverage: data.vote_average,
     },
+    static: {
+      id: String(data.id),
+      seasonNumber: data.season_number,
 
-    images: {
-      posters: filterImages(data.images.posters),
-    },
+      name: data.name,
+      overview: data.overview,
+      firstAirDate: data.air_date,
 
-    videos: data.videos.results,
+      externalIds: {
+        freebaseMid: data.external_ids.freebase_mid,
+        freebaseId: data.external_ids.freebase_id,
+        tvdbId: data.external_ids.tvdb_id,
+        tvrageId: data.external_ids.tvrage_id,
+        wikidataId: data.external_ids.wikidata_id,
+      },
 
-    translations: data.translations.translations.reduce<Record<string, { name?: string; overview?: string }>>(
-      (acc, trans) => {
+      images: {
+        posters: filterImages(data.images.posters),
+      },
+
+      videos: data.videos.results,
+
+      translations: data.translations.translations.reduce<
+        Record<string, { name?: string; overview?: string }>
+      >((acc, trans) => {
         if (trans.iso_639_1 in acc || !supportedTranslations.includes(trans.iso_639_1)) return acc;
 
         return {
@@ -113,61 +116,65 @@ export const TvSeasonDetailsSchema = z
             ...(trans.data.overview ? { overview: trans.data.overview } : {}),
           },
         };
-      },
-      {},
-    ),
-
-    credits: {
-      cast: data.credits.cast.sort((a, b) => a.order - b.order).map((cast) => `${cast.id}-${cast.credit_id}`),
-      crew: data.credits.crew.map((cast) => `${cast.id}-${cast.credit_id}`),
-    },
-
-    episodes: data.episodes.map((episode) => ({
-      id: String(episode.id),
-      seasonNumber: episode.season_number,
-      episodeNumber: episode.episode_number,
-
-      name: episode.name,
-      overview: episode.overview,
-      firstAirDate: episode.air_date,
-      productionCode: episode.production_code,
-      runtime: episode.runtime,
-
-      voteAverage: episode.vote_average,
-      voteCount: episode.vote_count,
-
-      images: {
-        stills: episode.still_path
-          ? [
-              {
-                lang: 'global',
-                width: 1290,
-                height: 726,
-                path: episode.still_path,
-              },
-            ]
-          : [],
-      },
-
-      translations: {},
-
-      externalIds: {
-        imdbId: null,
-        freebaseMid: null,
-        freebaseId: null,
-        tvdbId: null,
-        tvrageId: null,
-        wikidataId: null,
-      },
+      }, {}),
 
       credits: {
-        cast: [],
-        crew: episode.crew.map((cast) => `${cast.id}-${cast.credit_id}`),
-        guestStars: episode.guest_stars
+        cast: data.credits.cast
           .sort((a, b) => a.order - b.order)
           .map((cast) => `${cast.id}-${cast.credit_id}`),
+        crew: data.credits.crew.map((cast) => `${cast.id}-${cast.credit_id}`),
       },
-    })),
+
+      episodes: data.episodes.map((episode) => ({
+        dynamic: {
+          voteAverage: episode.vote_average,
+          voteCount: episode.vote_count,
+        },
+        static: {
+          id: String(episode.id),
+          seasonNumber: episode.season_number,
+          episodeNumber: episode.episode_number,
+
+          name: episode.name,
+          overview: episode.overview,
+          firstAirDate: episode.air_date,
+          productionCode: episode.production_code,
+          runtime: episode.runtime,
+
+          images: {
+            stills: episode.still_path
+              ? [
+                  {
+                    lang: 'global',
+                    width: 1290,
+                    height: 726,
+                    path: episode.still_path,
+                  },
+                ]
+              : [],
+          },
+
+          translations: {},
+
+          externalIds: {
+            imdbId: null,
+            freebaseMid: null,
+            freebaseId: null,
+            tvdbId: null,
+            tvrageId: null,
+            wikidataId: null,
+          },
+
+          credits: {
+            cast: [],
+            crew: episode.crew.map((cast) => `${cast.id}-${cast.credit_id}`),
+            guestStars: episode.guest_stars
+              .sort((a, b) => a.order - b.order)
+              .map((cast) => `${cast.id}-${cast.credit_id}`),
+          },
+        },
+      })),
+    },
   }));
 
 export type TvSeasonDetails = z.infer<typeof TvSeasonDetailsSchema>;

@@ -54,25 +54,28 @@ export const TvEpisodeDetailsSchema = z
     }),
   })
   .transform((data) => ({
-    id: String(data.id),
-    seasonNumber: data.season_number,
-    episodeNumber: data.episode_number,
-
-    name: data.name,
-    overview: data.overview,
-    firstAirDate: data.air_date,
-    productionCode: data.production_code,
-    runtime: data.runtime,
-
-    voteAverage: data.vote_average,
-    voteCount: data.vote_count,
-
-    images: {
-      stills: filterImages(data.images.stills),
+    dynamic: {
+      voteAverage: data.vote_average,
+      voteCount: data.vote_count,
     },
+    static: {
+      id: String(data.id),
+      seasonNumber: data.season_number,
+      episodeNumber: data.episode_number,
 
-    translations: data.translations.translations.reduce<Record<string, { name?: string; overview?: string }>>(
-      (acc, trans) => {
+      name: data.name,
+      overview: data.overview,
+      firstAirDate: data.air_date,
+      productionCode: data.production_code,
+      runtime: data.runtime,
+
+      images: {
+        stills: filterImages(data.images.stills),
+      },
+
+      translations: data.translations.translations.reduce<
+        Record<string, { name?: string; overview?: string }>
+      >((acc, trans) => {
         if (trans.iso_639_1 in acc || !supportedTranslations.includes(trans.iso_639_1)) return acc;
 
         return {
@@ -82,25 +85,26 @@ export const TvEpisodeDetailsSchema = z
             ...(trans.data.overview ? { overview: trans.data.overview } : {}),
           },
         };
+      }, {}),
+
+      externalIds: {
+        imdbId: data.external_ids.imdb_id,
+        freebaseMid: data.external_ids.freebase_mid,
+        freebaseId: data.external_ids.freebase_id,
+        tvdbId: data.external_ids.tvdb_id,
+        tvrageId: data.external_ids.tvrage_id,
+        wikidataId: data.external_ids.wikidata_id,
       },
-      {},
-    ),
 
-    externalIds: {
-      imdbId: data.external_ids.imdb_id,
-      freebaseMid: data.external_ids.freebase_mid,
-      freebaseId: data.external_ids.freebase_id,
-      tvdbId: data.external_ids.tvdb_id,
-      tvrageId: data.external_ids.tvrage_id,
-      wikidataId: data.external_ids.wikidata_id,
-    },
-
-    credits: {
-      cast: data.credits.cast.sort((a, b) => a.order - b.order).map((cast) => `${cast.id}-${cast.credit_id}`),
-      crew: data.credits.crew.map((cast) => `${cast.id}-${cast.credit_id}`),
-      guestStars: data.credits.guest_stars
-        .sort((a, b) => a.order - b.order)
-        .map((cast) => `${cast.id}-${cast.credit_id}`),
+      credits: {
+        cast: data.credits.cast
+          .sort((a, b) => a.order - b.order)
+          .map((cast) => `${cast.id}-${cast.credit_id}`),
+        crew: data.credits.crew.map((cast) => `${cast.id}-${cast.credit_id}`),
+        guestStars: data.credits.guest_stars
+          .sort((a, b) => a.order - b.order)
+          .map((cast) => `${cast.id}-${cast.credit_id}`),
+      },
     },
   }));
 

@@ -10,7 +10,7 @@ export const getCompleteTvDetails = async (id: string) => {
   if (!rawTvDetails.data) return { data: undefined, errors: [rawTvDetails] };
   const tvDetails = rawTvDetails.data!;
 
-  const rawSeasons = await getBatchedSeasonDetails(id, tvDetails.seasons);
+  const rawSeasons = await getBatchedSeasonDetails(id, tvDetails.static.seasons);
 
   if (rawSeasons.some((season) => !season.data)) {
     return { data: undefined, errors: rawSeasons.filter((season) => !season.data) };
@@ -19,31 +19,51 @@ export const getCompleteTvDetails = async (id: string) => {
   const seasons = rawSeasons.map((season) => season.data!);
 
   const episodePromises = seasons.map((season) => {
-    return getBatchedEpisodeDetails(id, season.seasonNumber, season.episodes);
+    return getBatchedEpisodeDetails(
+      id,
+      season.static.seasonNumber,
+      season.static.episodes.map((e) => e.static),
+    );
   });
 
   const rawEpisodes = await Promise.all(episodePromises);
 
   const combined = {
-    ...tvDetails,
-    seasons: seasons.map((season, i) => {
-      const episodes = rawEpisodes[i].map((episode, j) => {
-        if (!episode.data) {
-          const ep = season.episodes[j];
+    dynamic: {
+      ...tvDetails.dynamic,
+      seasons: seasons.map((season) => ({
+        ...season.dynamic,
+        seasonNumber: season.static.seasonNumber,
+        episodes: season.static.episodes.map((episode) => ({
+          ...episode.dynamic,
+          episodeNumber: episode.static.episodeNumber,
+        })),
+      })),
+    },
+    static: {
+      ...tvDetails.static,
+      seasons: seasons.map((season, i) => {
+        const episodes = rawEpisodes[i].map((episode, j) => {
+          if (!episode.data) {
+            const ep = season.static.episodes[j];
 
-          logger.info(`Not found E${ep.episodeNumber}S${ep.seasonNumber} for show with id ${id}`, {
-            type: 'episode_not_found',
-            req: { tv: id, season: ep.seasonNumber, episode: ep.episodeNumber },
-          });
+            logger.info(
+              `Not found E${ep.static.episodeNumber}S${ep.static.seasonNumber} for show with id ${id}`,
+              {
+                type: 'episode_not_found',
+                req: { tv: id, season: ep.static.seasonNumber, episode: ep.static.episodeNumber },
+              },
+            );
 
-          return ep;
-        }
+            return ep;
+          }
 
-        return episode.data;
-      });
+          return episode.data.static;
+        });
 
-      return { ...season, episodes };
-    }),
+        return { ...season.static, episodes };
+      }),
+    },
   };
 
   return { data: combined, errors: [] };
@@ -110,7 +130,7 @@ export const getBatchedEpisodeDetails = async (
   season: number,
   episodes: { episodeNumber: number; id: string }[],
 ) => {
-  const batches = group(episodes, 4);
+  const batches = group(episodes, 3);
 
   const promises = batches.map((batch) => {
     const appends = ['translations', 'external_ids', 'images', 'credits'];
@@ -131,8 +151,8 @@ export const getBatchedEpisodeDetails = async (
       batches[i].map(({ id, episodeNumber }) =>
         res[`episode/${episodeNumber}`]
           ? {
-              id: parseInt(id, 10),
               ...res[`episode/${episodeNumber}`],
+              id: parseInt(id, 10),
               season_number: season,
               episode_number: episodeNumber,
               translations: res[`episode/${episodeNumber}/translations`],
