@@ -7,7 +7,7 @@ import * as stream from 'stream';
 import { promisify } from 'util';
 import { createGunzip } from 'zlib';
 
-import { logger } from '$/utils/logger';
+import { logger } from '$/lib/logger';
 
 const pipeline = promisify(stream.pipeline);
 

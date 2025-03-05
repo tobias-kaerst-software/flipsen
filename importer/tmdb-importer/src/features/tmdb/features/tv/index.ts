@@ -2,8 +2,8 @@ import { TvDetailsSchema } from '$/features/tmdb/features/tv/schemas/TvDetails.s
 import { TvEpisodeDetailsSchema } from '$/features/tmdb/features/tv/schemas/TvEpisodeDetails.schema';
 import { TvSeasonDetailsSchema } from '$/features/tmdb/features/tv/schemas/TvSeasonDetails.schema';
 import { tmdb } from '$/features/tmdb/lib/http';
-import { group } from '$/utils/array';
-import { logger } from '$/utils/logger';
+import { group } from '$/lib/array';
+import { logger } from '$/lib/logger';
 
 export const getCompleteTvDetails = async (id: string) => {
   const rawTvDetails = await getTvDetails(id);

@@ -1,4 +1,4 @@
-import { logtail, logtailDebouncedFlush } from '$/utils/clients/logtail';
+import { logtail, logtailDebouncedFlush } from '$/lib/clients/logtail';
 
 export const logger = {
   error: (msg: string, payload?: object) => {

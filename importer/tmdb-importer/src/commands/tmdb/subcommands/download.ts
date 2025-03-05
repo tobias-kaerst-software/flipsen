@@ -8,7 +8,7 @@ import { getCollectionDetails } from '$/features/tmdb/features/collections';
 import { getMovieDetails } from '$/features/tmdb/features/movies';
 import { getPersonDetails } from '$/features/tmdb/features/person';
 import { getCompleteTvDetails } from '$/features/tmdb/features/tv';
-import { logger } from '$/utils/logger';
+import { logger } from '$/lib/logger';
 
 export const downloadCommand = new Command()
   .command('download')

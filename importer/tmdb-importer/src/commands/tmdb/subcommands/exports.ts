@@ -5,7 +5,7 @@ import path from 'path';
 import type { TmdbExportType } from '$/features/tmdb/features/downloadDailyExports';
 
 import { downloadDailyExport, downloadDailyExports } from '$/features/tmdb/features/downloadDailyExports';
-import { logger } from '$/utils/logger';
+import { logger } from '$/lib/logger';
 
 export const dailyExportsCommand = new Command()
   .command('exports')

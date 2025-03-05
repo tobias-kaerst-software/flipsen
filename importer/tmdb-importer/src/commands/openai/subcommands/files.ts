@@ -2,9 +2,9 @@ import { Command } from 'commander';
 import { createReadStream, existsSync, readdirSync } from 'fs';
 import path from 'path';
 
-import { openai } from '$/utils/clients/openai';
-import { logger } from '$/utils/logger';
-import { promisesWithProgress } from '$/utils/utils';
+import { openai } from '$/lib/clients/openai';
+import { logger } from '$/lib/logger';
+import { promisesWithProgress } from '$/lib/utils';
 
 export const uploadFilesCommand = new Command()
   .command('files')

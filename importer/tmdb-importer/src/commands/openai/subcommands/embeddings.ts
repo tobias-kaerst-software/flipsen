@@ -6,8 +6,8 @@ import path from 'path';
 import type { MovieDetails } from '$/features/tmdb/features/movies/schemas/MovieDetails.schema';
 
 import { movieToBatchInput } from '$/features/tmdb/features/movies';
-import { logger } from '$/utils/logger';
-import { promisesWithProgress } from '$/utils/utils';
+import { logger } from '$/lib/logger';
+import { promisesWithProgress } from '$/lib/utils';
 
 const MAX_BATCH_LINES = 20_000;
 

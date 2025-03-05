@@ -5,7 +5,7 @@ import axios from 'axios';
 import rateLimit from 'axios-rate-limit';
 
 import { config, env } from '$/config';
-import { logger } from '$/utils/logger';
+import { logger } from '$/lib/logger';
 
 export const supportedTranslations = config.tmdbSupportedTranslations;
 

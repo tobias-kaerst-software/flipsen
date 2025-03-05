@@ -2,8 +2,8 @@ import type { BatchCreateParams } from 'openai/resources';
 
 import { Command } from 'commander';
 
-import { openai } from '$/utils/clients/openai';
-import { logger } from '$/utils/logger';
+import { openai } from '$/lib/clients/openai';
+import { logger } from '$/lib/logger';
 
 export const initiateBatchesCommand = new Command()
   .command('initiate')
