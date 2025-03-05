@@ -29,3 +29,6 @@ program.parse();
 
 // const tv = await getCompleteTvDetails('1399');
 // Bun.write('tv.json', JSON.stringify(tv, null, 2));
+
+// const company = await getCompanyDetails('420');
+// Bun.write('company.json', JSON.stringify(company, null, 2));

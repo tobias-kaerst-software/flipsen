@@ -5,20 +5,20 @@ import path from 'path';
 import readline from 'readline';
 
 import { getCollectionDetails } from '$/features/tmdb/features/collections';
+import { getCompanyDetails } from '$/features/tmdb/features/companies';
 import { getMovieDetails } from '$/features/tmdb/features/movies';
 import { getPersonDetails } from '$/features/tmdb/features/person';
 import { getCompleteTvDetails } from '$/features/tmdb/features/tv';
-import { logger } from '$/lib/logger';
 
 export const downloadCommand = new Command()
   .command('download')
   .description('Download all movies from given ids as json files to the output directory.')
-  .argument('<movie | tv | collections | persons>', 'Type of data to download from the api')
+  .argument('<movie | tv | collections | persons | companies>', 'Type of data to download from the api')
   .requiredOption('--input-file, -i <string>', 'Input file with movie ids')
   .option('--out-dir, -o <string>', 'Output directory', '.')
   .action(
     async (
-      type: 'collections' | 'movie' | 'persons' | 'tv',
+      type: 'collections' | 'companies' | 'movie' | 'persons' | 'tv',
       options: { inputFile: string; outDir: string },
     ) => {
       const filePath = path.resolve(options.outDir, 'files');
@@ -44,7 +44,10 @@ export const downloadCommand = new Command()
         const id = String(json.id);
 
         if (existsSync(path.resolve(filePath, `${json.id}.json`))) {
-          return logger.debug(`Skipping ${json.id}.json file`);
+          process.stdout.clearLine(0);
+          process.stdout.cursorTo(0);
+          process.stdout.write(`Skipping ${json.id}.json file`);
+          return;
         }
 
         queue.add(async () => {
@@ -80,6 +83,15 @@ export const downloadCommand = new Command()
 
             if (type === 'persons') {
               const { data, status } = await getPersonDetails(id);
+
+              if (status === 404) missingIds.push(id);
+              else if (status !== 200) erroredIds.push(id);
+
+              return data;
+            }
+
+            if (type === 'companies') {
+              const { data, status } = await getCompanyDetails(id);
 
               if (status === 404) missingIds.push(id);
               else if (status !== 200) erroredIds.push(id);

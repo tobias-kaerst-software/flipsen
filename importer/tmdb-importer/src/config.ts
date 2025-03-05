@@ -15,4 +15,5 @@ export const config = {
   tmdbSupportedTranslations: ['de'],
   tmdbProxyUrls: ['https://api.themoviedb.org/3'],
   logtailFlushDebounceTime: 1000,
+  shouldLogToLogtail: false,
 };
