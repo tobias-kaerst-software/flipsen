@@ -4,20 +4,18 @@ import type { SafeParseReturnType } from 'zod';
 import axios from 'axios';
 import rateLimit from 'axios-rate-limit';
 
-import { env } from '$/config';
+import { config, env } from '$/config';
 import { logger } from '$/utils/logger';
 
-export const supportedTranslations = ['de'];
+export const supportedTranslations = config.tmdbSupportedTranslations;
 
 export const tmdbDefaultParams = {
-  language: 'en-US',
-  include_image_language: 'de,en,null',
-  include_video_language: 'de,en,null',
+  language: config.tmdbDefaultLang,
+  include_image_language: config.tmdbSupportedLanguages.join(',') + ',null',
+  include_video_language: config.tmdbSupportedLanguages.join(',') + ',null',
 };
 
-const proxyUrls = ['https://api.themoviedb.org/3'];
-
-const clients = proxyUrls.map((url) =>
+const clients = config.tmdbProxyUrls.map((url) =>
   rateLimit(
     axios.create({
       baseURL: url,
@@ -35,15 +33,19 @@ let requestCounter = 0;
 export const tmdb = async <I, O>(
   url: string,
   params: Record<string, string>,
-  parser: (data: unknown) => SafeParseReturnType<I, O>,
-  skipFetchErrorLogging = false,
+  parser: (data: unknown) => SafeParseReturnType<I, O> = (d) => ({ success: true, data: d as O }),
 ) => {
   const client = clients[requestCounter++ % clients.length];
 
   const res = await client
     .get(url, { params: { ...tmdbDefaultParams, ...params } })
     .catch((e: AxiosError) => {
-      logger.error('could_not_fetch', e, { url }, skipFetchErrorLogging);
+      logger.error(e.message, {
+        type: 'axios_error',
+        req: { url, params },
+        res: { data: e.response?.data, headers: e.response?.headers, status: e.response?.status },
+      });
+
       return e.status ?? 500;
     });
 
@@ -54,7 +56,12 @@ export const tmdb = async <I, O>(
   const data = parser(res?.data);
 
   if (!data.success) {
-    logger.error('could_not_parse', data.error, { url });
+    logger.error(data.error.message, {
+      type: 'zod_error',
+      req: { url, params },
+      error: data.error,
+    });
+
     return { err: 'could_not_parse' as const, status: 500, data: undefined };
   }
 

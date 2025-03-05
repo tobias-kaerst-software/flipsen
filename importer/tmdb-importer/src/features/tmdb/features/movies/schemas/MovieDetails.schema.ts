@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
 import { supportedTranslations } from '$/features/tmdb/lib/http';
-import { TmdbAlternativeTitlesSchema } from '$/features/tmdb/schemas/TmdbAlternativeTitles.schema';
-import { TmdbBasicPersonSchema } from '$/features/tmdb/schemas/TmdbBasicPerson.schema';
 import { filterImages, TmdbImageSchema } from '$/features/tmdb/schemas/TmdbImage.schema';
 import { TmdbProductionCompaniesSchema } from '$/features/tmdb/schemas/TmdbProductionCompanies.schema';
 import { TmdbVideosSchema } from '$/features/tmdb/schemas/TmdbVideo.schema';
@@ -13,7 +11,9 @@ export const MovieDetailsSchema = z
 
     title: z.string(),
     original_title: z.string(),
-    alternative_titles: z.object({ titles: TmdbAlternativeTitlesSchema }),
+    alternative_titles: z.object({
+      titles: z.array(z.object({ iso_3166_1: z.string(), title: z.string() })),
+    }),
 
     overview: z.string(),
     tagline: z.string(),
@@ -102,16 +102,8 @@ export const MovieDetailsSchema = z
 
     credits: z
       .object({
-        cast: z.array(
-          z
-            .object({ cast_id: z.number(), character: z.string(), credit_id: z.string(), order: z.number() })
-            .and(TmdbBasicPersonSchema),
-        ),
-        crew: z.array(
-          z
-            .object({ credit_id: z.string(), department: z.string(), job: z.string() })
-            .and(TmdbBasicPersonSchema),
-        ),
+        cast: z.array(z.object({ id: z.number(), credit_id: z.string(), order: z.number() })),
+        crew: z.array(z.object({ id: z.number(), credit_id: z.string(), department: z.string() })),
       })
       .optional()
       .default({ cast: [], crew: [] }),
@@ -128,7 +120,7 @@ export const MovieDetailsSchema = z
       title: data.title,
       originalTitle: data.original_title,
       alternativeTitles: data.alternative_titles.titles.reduce<Record<string, string>>((acc, title) => {
-        return title.country in acc ? acc : { ...acc, [title.country]: title.title };
+        return title.iso_3166_1 in acc ? acc : { ...acc, [title.iso_3166_1]: title.title };
       }, {}),
 
       overview: data.overview,

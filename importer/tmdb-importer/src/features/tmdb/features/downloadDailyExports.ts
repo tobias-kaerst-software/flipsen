@@ -1,9 +1,3 @@
-// http://files.tmdb.org/p/exports/movie_ids_02_26_2025.json.gz
-// http://files.tmdb.org/p/exports/tv_series_02_26_2025.json.gz
-// http://files.tmdb.org/p/exports/person_ids_02_26_2025.json.gz
-// http://files.tmdb.org/p/exports/collection_ids_02_26_2025.json.gz
-// http://files.tmdb.org/p/exports/production_company_ids_02_26_2025.json.gz
-
 import type { AxiosError } from 'axios';
 
 import axios from 'axios';
@@ -40,7 +34,12 @@ export const downloadDailyExport = async (output: string, type: TmdbExportType) 
   const downloadUrl = `http://files.tmdb.org/p/exports/${filename}.json.gz`;
 
   const res = await axios.get(downloadUrl, { responseType: 'stream' }).catch((e: AxiosError) => {
-    logger.error('could_not_fetch', { status: e.status }, { downloadUrl });
+    logger.error(e.message, {
+      type: 'axios_error',
+      req: { url: downloadUrl },
+      res: { data: e.response?.data, headers: e.response?.headers, status: e.response?.status },
+    });
+
     return e.status ?? 500;
   });
 

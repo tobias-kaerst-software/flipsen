@@ -60,6 +60,7 @@ export const downloadCommand = new Command()
 
             if (type === 'tv') {
               const { data, errors } = await getCompleteTvDetails(id);
+
               const has404 = errors?.some((err) => err?.status === 404);
 
               if (has404) missingIds.push(id);

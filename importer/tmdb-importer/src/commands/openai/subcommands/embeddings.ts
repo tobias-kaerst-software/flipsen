@@ -3,7 +3,7 @@ import { existsSync, readdirSync } from 'fs';
 import { readFile } from 'fs/promises';
 import path from 'path';
 
-import type { MovieDetails } from '$/features/tmdb/features/movies/schemas/transformers/MovieDetails.schema';
+import type { MovieDetails } from '$/features/tmdb/features/movies/schemas/MovieDetails.schema';
 
 import { movieToBatchInput } from '$/features/tmdb/features/movies';
 import { logger } from '$/utils/logger';
@@ -32,7 +32,7 @@ export const createBatchEmbeddingsCommand = new Command()
 
         const input = movieToBatchInput(json);
         const request = {
-          custom_id: json.id,
+          custom_id: json.static.id,
           method: 'POST',
           url: '/v1/embeddings',
           body: { input, model: 'text-embedding-3-large', encoding_format: 'float', dimensions: 1024 },

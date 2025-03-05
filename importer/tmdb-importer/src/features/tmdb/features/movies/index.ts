@@ -10,18 +10,10 @@ export const getMovieDetails = async (id: string) => {
 };
 
 export const movieToBatchInput = (movie: MovieDetails) => {
-  const translated = {
-    title: movie.title,
-    genres: movie.genres,
-    keywords: movie.keywords,
-    overview: movie.overview,
-    ...movie.translations.find((t) => t.language === 'en')?.data,
-  };
-
   return [
-    `Title: ${translated.title || 'Unknown Title'}`,
-    `Genres: ${translated.genres.join(', ') || 'Unknown Genres'}`,
-    `Keywords: ${translated.keywords.join(', ') || 'Unknown Keywords'}`,
-    `Overview: ${translated.overview || 'Unknown Overview'}`,
+    `Title: ${movie.static.title || 'Unknown Title'}`,
+    `Genres: ${movie.static.genres.join(', ') || 'Unknown Genres'}`,
+    `Keywords: ${movie.static.keywords.join(', ') || 'Unknown Keywords'}`,
+    `Overview: ${movie.static.overview || 'Unknown Overview'}`,
   ].join('; ');
 };

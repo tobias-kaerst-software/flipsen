@@ -1,30 +1,16 @@
-import { red } from 'picocolors';
-
-interface Writer {
-  write: (message: string) => void;
-}
-
-const consoleWriter: Writer = {
-  write(message: string) {
-    console.log(message);
-  },
-};
+import { logtail, logtailDebouncedFlush } from '$/utils/clients/logtail';
 
 export const logger = {
-  error: (msg: string, error: object, payload?: object, skipFetchErrorLogging = false) => {
-    consoleWriter.write(red(`ERROR: ${msg}`) + '\n' + JSON.stringify({ error, payload }, null, 2));
-
-    if (skipFetchErrorLogging) return undefined;
-    Bun.write(`errors/${Date.now()}.log`, JSON.stringify({ msg, error, payload }, null, 2));
-
-    return undefined;
+  error: (msg: string, payload?: object) => {
+    logtail.error(msg, payload);
+    return logtailDebouncedFlush();
   },
   info: (msg: string, payload?: object) => {
-    consoleWriter.write(`INFO: ${msg}` + (payload ? '\n' + JSON.stringify(payload, null, 2) : ''));
-    return undefined;
+    logtail.info(msg, payload);
+    return logtailDebouncedFlush();
   },
   debug: (msg: string, payload?: object) => {
-    consoleWriter.write(`DEBUG: ${msg}` + (payload ? '\n' + JSON.stringify(payload, null, 2) : ''));
-    return undefined;
+    logtail.debug(msg, payload);
+    return logtailDebouncedFlush();
   },
 };
