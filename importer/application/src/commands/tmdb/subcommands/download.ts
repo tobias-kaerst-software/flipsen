@@ -13,21 +13,23 @@ import { getCompleteTvDetails } from '$/features/tmdb/features/tv';
 export const downloadCommand = new Command()
   .command('download')
   .description('Download all movies from given ids as json files to the output directory.')
-  .argument('<movie | tv | collections | persons | companies>', 'Type of data to download from the api')
+  .argument('<movies | tvs | collections | persons | companies>', 'Type of data to download from the api')
   .requiredOption('--input-file, -i <string>', 'Input file with movie ids')
   .option('--out-dir, -o <string>', 'Output directory', '.')
+  .option('--concurrency, -c <number>', 'Number of concurrent requests', '40')
+  .option('--error-dir, -e <string>', 'Output directory for error logs', '.')
   .action(
     async (
-      type: 'collections' | 'companies' | 'movie' | 'persons' | 'tv',
-      options: { inputFile: string; outDir: string },
+      type: 'collections' | 'companies' | 'movies' | 'persons' | 'tvs',
+      options: { concurrency: string; errorDir: string; inputFile: string; outDir: string },
     ) => {
-      const filePath = path.resolve(options.outDir, 'files');
-      const errorPath = path.resolve(options.outDir, 'logs', String(Date.now()));
+      const filePath = path.resolve(options.outDir);
+      const errorPath = path.resolve(options.errorDir, String(Date.now()));
 
       if (!existsSync(filePath)) mkdirSync(filePath, { recursive: true });
       if (!existsSync(filePath)) mkdirSync(errorPath, { recursive: true });
 
-      const queue = new PQueue({ concurrency: 40 });
+      const queue = new PQueue({ concurrency: parseInt(options.concurrency, 10) });
 
       const lineReader = readline.createInterface({
         input: createReadStream(options.inputFile),
@@ -52,7 +54,7 @@ export const downloadCommand = new Command()
 
         queue.add(async () => {
           const downloadFunction = async () => {
-            if (type === 'movie') {
+            if (type === 'movies') {
               const { data, status } = await getMovieDetails(id);
 
               if (status === 404) missingIds.push(id);
@@ -61,7 +63,7 @@ export const downloadCommand = new Command()
               return data;
             }
 
-            if (type === 'tv') {
+            if (type === 'tvs') {
               const { data, errors } = await getCompleteTvDetails(id);
 
               const has404 = errors?.some((err) => err?.status === 404);

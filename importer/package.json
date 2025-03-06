@@ -1,11 +1,11 @@
 {
-    "name": "importer",
-    "workspaces": [
-      "tmdb-importer",
-      "modules/*"
-    ],
-    "scripts": {
-      "frontend": "bun --filter 'frontend'",
-      "deps": "bunx npm-check-updates --workspaces --root -u"
-    }
+  "name": "importer",
+  "workspaces": [
+    "application",
+    "modules/*"
+  ],
+  "scripts": {
+    "frontend": "bun --filter 'frontend'",
+    "deps": "bunx npm-check-updates --workspaces --root -u"
   }
+}
