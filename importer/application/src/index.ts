@@ -17,18 +17,3 @@ if (process.argv.length === 2) {
 }
 
 program.parse();
-
-// const person = await getPersonDetails('525');
-// Bun.write('person.json', JSON.stringify(person, null, 2));
-
-// const collection = await getCollectionDetails('10');
-// Bun.write('collection.json', JSON.stringify(collection, null, 2));
-
-// const movie = await getMovieDetails('693134');
-// Bun.write('movie.json', JSON.stringify(movie, null, 2));
-
-// const tv = await getCompleteTvDetails('1399');
-// Bun.write('tv.json', JSON.stringify(tv, null, 2));
-
-// const company = await getCompanyDetails('420');
-// Bun.write('company.json', JSON.stringify(company, null, 2));

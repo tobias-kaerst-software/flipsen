@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { createReadStream, existsSync, mkdirSync } from 'fs';
+import { createReadStream, existsSync, mkdirSync, rmSync } from 'fs';
 import PQueue from 'p-queue';
 import path from 'path';
 import readline from 'readline';
@@ -9,6 +9,7 @@ import { getCompanyDetails } from '$/features/tmdb/features/companies';
 import { getMovieDetails } from '$/features/tmdb/features/movies';
 import { getPersonDetails } from '$/features/tmdb/features/person';
 import { getCompleteTvDetails } from '$/features/tmdb/features/tv';
+import { logger } from '$/lib/logger';
 
 export const downloadCommand = new Command()
   .command('download')
@@ -18,16 +19,23 @@ export const downloadCommand = new Command()
   .option('--out-dir, -o <string>', 'Output directory', '.')
   .option('--concurrency, -c <number>', 'Number of concurrent requests', '40')
   .option('--error-dir, -e <string>', 'Output directory for error logs', '.')
+  .option('--overwrite -f <boolean>', 'Overwrite existing files', false)
   .action(
     async (
       type: 'collections' | 'companies' | 'movies' | 'persons' | 'tvs',
-      options: { concurrency: string; errorDir: string; inputFile: string; outDir: string },
+      options: {
+        concurrency: string;
+        errorDir: string;
+        inputFile: string;
+        outDir: string;
+        overwrite: boolean;
+      },
     ) => {
       const filePath = path.resolve(options.outDir);
       const errorPath = path.resolve(options.errorDir, String(Date.now()));
 
       if (!existsSync(filePath)) mkdirSync(filePath, { recursive: true });
-      if (!existsSync(filePath)) mkdirSync(errorPath, { recursive: true });
+      if (!existsSync(errorPath)) mkdirSync(errorPath, { recursive: true });
 
       const queue = new PQueue({ concurrency: parseInt(options.concurrency, 10) });
 
@@ -45,7 +53,7 @@ export const downloadCommand = new Command()
         const json = JSON.parse(line) as { id: number };
         const id = String(json.id);
 
-        if (existsSync(path.resolve(filePath, `${json.id}.json`))) {
+        if (!options.overwrite && existsSync(path.resolve(filePath, `${json.id}.json`))) {
           process.stdout.clearLine(0);
           process.stdout.cursorTo(0);
           process.stdout.write(`Skipping ${json.id}.json file`);
@@ -60,7 +68,7 @@ export const downloadCommand = new Command()
               if (status === 404) missingIds.push(id);
               else if (status !== 200) erroredIds.push(id);
 
-              return data;
+              return { data, isMissing: status === 404 };
             }
 
             if (type === 'tvs') {
@@ -71,7 +79,7 @@ export const downloadCommand = new Command()
               if (has404) missingIds.push(id);
               else if (!data) erroredIds.push(id);
 
-              return data;
+              return { data, isMissing: has404 };
             }
 
             if (type === 'collections') {
@@ -80,7 +88,7 @@ export const downloadCommand = new Command()
               if (status === 404) missingIds.push(id);
               else if (status !== 200) erroredIds.push(id);
 
-              return data;
+              return { data, isMissing: status === 404 };
             }
 
             if (type === 'persons') {
@@ -89,7 +97,7 @@ export const downloadCommand = new Command()
               if (status === 404) missingIds.push(id);
               else if (status !== 200) erroredIds.push(id);
 
-              return data;
+              return { data, isMissing: status === 404 };
             }
 
             if (type === 'companies') {
@@ -98,13 +106,18 @@ export const downloadCommand = new Command()
               if (status === 404) missingIds.push(id);
               else if (status !== 200) erroredIds.push(id);
 
-              return data;
+              return { data, isMissing: status === 404 };
             }
 
-            return undefined;
+            return { data: undefined, isMissing: false };
           };
 
-          const data = await downloadFunction();
+          const { data, isMissing } = await downloadFunction();
+
+          if (isMissing) {
+            logger.info(`Entry of type ${type} with id ${id} is missing. Forcing removal of file.`);
+            rmSync(path.resolve(filePath, `${json.id}.json`), { force: true });
+          }
 
           if (!data) {
             Bun.write(
