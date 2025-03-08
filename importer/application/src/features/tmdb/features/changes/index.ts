@@ -2,7 +2,7 @@ import { ChangesSchema } from '$/features/tmdb/features/changes/schemas/Changes.
 import { tmdb } from '$/features/tmdb/lib/http';
 
 export const getTmdbChanges = async (type: 'movie' | 'person' | 'tv', start: string, end: string) => {
-  const initial = await tmdb('movie/changes', { start_date: start, end_date: end, page: '1' }, (data) =>
+  const initial = await tmdb(`${type}/changes`, { start_date: start, end_date: end, page: '1' }, (data) =>
     ChangesSchema.safeParse(data),
   );
 
@@ -21,7 +21,10 @@ export const getTmdbChanges = async (type: 'movie' | 'person' | 'tv', start: str
   }
 
   return {
-    data: results.reduce((acc, result) => acc.concat(result.data!.results), initial.data.results),
+    data: results.reduce(
+      (acc, result) => (result.data ? acc.concat(result.data.results) : acc),
+      initial.data.results,
+    ),
     errors: [],
   };
 };
