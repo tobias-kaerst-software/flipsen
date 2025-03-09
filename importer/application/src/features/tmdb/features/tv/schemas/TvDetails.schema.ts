@@ -10,9 +10,10 @@ export const TvDetailsSchema = z
 
     name: z.string(),
     original_name: z.string(),
-    alternative_titles: z.object({
-      results: z.array(z.object({ iso_3166_1: z.string(), title: z.string() })),
-    }),
+    alternative_titles: z
+      .object({ results: z.array(z.object({ iso_3166_1: z.string(), title: z.string() })) })
+      .optional()
+      .default({ results: [] }),
 
     overview: z.string(),
     tagline: z.string(),
@@ -85,14 +86,17 @@ export const TvDetailsSchema = z
       }),
     ),
 
-    content_ratings: z.object({
-      results: z.array(
-        z.object({
-          iso_3166_1: z.string(),
-          rating: z.string(),
-        }),
-      ),
-    }),
+    content_ratings: z
+      .object({
+        results: z.array(
+          z.object({
+            iso_3166_1: z.string(),
+            rating: z.string(),
+          }),
+        ),
+      })
+      .optional()
+      .default({ results: [] }),
 
     seasons: z.array(z.object({ id: z.number(), season_number: z.number(), episode_count: z.number() })),
   })

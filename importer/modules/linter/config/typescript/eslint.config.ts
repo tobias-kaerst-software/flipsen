@@ -1,10 +1,6 @@
 import eslint from '@eslint/js';
-import { ESLint } from 'eslint';
-import eslintPluginJsxA11y from 'eslint-plugin-jsx-a11y';
 import eslintPluginPerfectionist from 'eslint-plugin-perfectionist';
 import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
-import eslintPluginReact from 'eslint-plugin-react';
-import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
 import * as eslintPluginRegexp from 'eslint-plugin-regexp';
 import tsEslint from 'typescript-eslint';
 import unusedImports from 'eslint-plugin-unused-imports';
@@ -14,12 +10,10 @@ export default tsEslint.config(
   ...tsEslint.configs.strict,
   eslintPluginPerfectionist.configs['recommended-natural'],
   eslintPluginRegexp.configs['flat/recommended'],
-  eslintPluginJsxA11y.flatConfigs.recommended,
   eslintPluginPrettier,
   {
-    plugins: { react: eslintPluginReact as ESLint.Plugin },
     languageOptions: {
-      parserOptions: { ecmaFeatures: { jsx: true }, projectService: true },
+      parserOptions: { projectService: true },
     },
   },
   {
@@ -40,16 +34,8 @@ export default tsEslint.config(
       ],
     },
   },
-  // @ts-ignore - The types are incorrect.
-  { plugins: { 'react-hooks': eslintPluginReactHooks }, rules: eslintPluginReactHooks.configs.recommended.rules },
   {
-    settings: { react: { version: 'detect' } },
     rules: {
-      // Vite automatically injects React into JSX files, so we don't need to import it.
-      'react/react-in-jsx-scope': 'off',
-      // We use TypeScript, so we don't need prop types.
-      'react/prop-types': 'off',
-
       // The developer should be able to decide whether to the non null assertion or not.
       '@typescript-eslint/no-non-null-assertion': 'off',
 

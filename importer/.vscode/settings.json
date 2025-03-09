@@ -7,7 +7,7 @@
     "**/node_modules": true
   },
 
-  "eslint.workingDirectories": ["tmdb-importer"],
+  "eslint.workingDirectories": ["application"],
 
   "typescript.preferences.importModuleSpecifier": "non-relative",
 

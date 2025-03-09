@@ -73,8 +73,10 @@ export const TvSeasonDetailsSchema = z
 
         still_path: z.string().nullable(),
 
-        crew: z.array(z.object({ id: z.number(), credit_id: z.string() })),
-        guest_stars: z.array(z.object({ id: z.number(), credit_id: z.string(), order: z.number() })),
+        crew: z.array(z.object({ id: z.number().optional(), credit_id: z.string() })),
+        guest_stars: z.array(
+          z.object({ id: z.number().optional(), credit_id: z.string(), order: z.number() }),
+        ),
       }),
     ),
   })
@@ -167,8 +169,9 @@ export const TvSeasonDetailsSchema = z
 
           credits: {
             cast: [],
-            crew: episode.crew.map((cast) => `${cast.id}-${cast.credit_id}`),
+            crew: episode.crew.filter((crew) => crew.id).map((cast) => `${cast.id}-${cast.credit_id}`),
             guestStars: episode.guest_stars
+              .filter((guest) => guest.id)
               .sort((a, b) => a.order - b.order)
               .map((cast) => `${cast.id}-${cast.credit_id}`),
           },

@@ -12,68 +12,96 @@ export const PersonDetailsSchema = z
     biography: z.string(),
     gender: z.number(),
 
-    birthday: z.string(),
+    birthday: z.string().nullable(),
     deathday: z.string().nullable(),
-    place_of_birth: z.string(),
+    place_of_birth: z.string().nullable(),
 
     homepage: z.string().nullable(),
-    known_for_department: z.string(),
+    known_for_department: z.string().nullable(),
 
     popularity: z.number(),
 
-    translations: z.object({
-      translations: z.array(
-        z.object({
-          iso_639_1: z.string(),
-          data: z.object({
-            name: z.string().nullable(),
-            biography: z.string().nullable(),
+    translations: z
+      .object({
+        translations: z.array(
+          z.object({
+            iso_639_1: z.string(),
+            data: z.object({
+              name: z.string().nullable(),
+              biography: z.string().nullable(),
+            }),
           }),
-        }),
-      ),
-    }),
+        ),
+      })
+      .optional()
+      .default({ translations: [] }),
 
-    external_ids: z.object({
-      imdb_id: z.string().nullable(),
-      freebase_mid: z.string().nullable(),
-      freebase_id: z.string().nullable(),
-      tvrage_id: z.number().nullable(),
-      wikidata_id: z.string().nullable(),
-      facebook_id: z.string().nullable(),
-      instagram_id: z.string().nullable(),
-      tiktok_id: z.string().nullable(),
-      twitter_id: z.string().nullable(),
-      youtube_id: z.string().nullable(),
-    }),
+    external_ids: z
+      .object({
+        imdb_id: z.string().nullable(),
+        freebase_mid: z.string().nullable(),
+        freebase_id: z.string().nullable(),
+        tvrage_id: z.number().nullable(),
+        wikidata_id: z.string().nullable(),
+        facebook_id: z.string().nullable(),
+        instagram_id: z.string().nullable(),
+        tiktok_id: z.string().nullable(),
+        twitter_id: z.string().nullable(),
+        youtube_id: z.string().nullable(),
+      })
+      .optional()
+      .default({
+        imdb_id: null,
+        freebase_mid: null,
+        freebase_id: null,
+        tvrage_id: null,
+        wikidata_id: null,
+        facebook_id: null,
+        instagram_id: null,
+        tiktok_id: null,
+        twitter_id: null,
+        youtube_id: null,
+      }),
 
     images: z
       .object({ profiles: z.array(TmdbImageSchema).optional().default([]) })
       .optional()
       .default({ profiles: [] }),
 
-    movie_credits: z.object({
-      cast: z.array(
-        z.object({ id: z.number(), character: z.string(), credit_id: z.string(), order: z.number() }),
-      ),
-      crew: z.array(
-        z.object({ id: z.number(), credit_id: z.string(), department: z.string(), job: z.string() }),
-      ),
-    }),
+    movie_credits: z
+      .object({
+        cast: z.array(
+          z.object({ id: z.number(), character: z.string(), credit_id: z.string(), order: z.number() }),
+        ),
+        crew: z.array(
+          z.object({ id: z.number(), credit_id: z.string(), department: z.string(), job: z.string() }),
+        ),
+      })
+      .optional()
+      .default({ cast: [], crew: [] }),
 
-    tv_credits: z.object({
-      cast: z.array(
-        z.object({ id: z.number(), character: z.string(), credit_id: z.string(), episode_count: z.number() }),
-      ),
-      crew: z.array(
-        z.object({
-          id: z.number(),
-          credit_id: z.string(),
-          department: z.string(),
-          episode_count: z.number(),
-          job: z.string(),
-        }),
-      ),
-    }),
+    tv_credits: z
+      .object({
+        cast: z.array(
+          z.object({
+            id: z.number(),
+            character: z.string(),
+            credit_id: z.string(),
+            episode_count: z.number().optional().nullable().default(null),
+          }),
+        ),
+        crew: z.array(
+          z.object({
+            id: z.number(),
+            credit_id: z.string(),
+            department: z.string(),
+            episode_count: z.number().optional().nullable().default(null),
+            job: z.string(),
+          }),
+        ),
+      })
+      .optional()
+      .default({ cast: [], crew: [] }),
   })
   .transform((data) => ({
     dynamic: {

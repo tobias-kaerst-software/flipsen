@@ -11,9 +11,10 @@ export const MovieDetailsSchema = z
 
     title: z.string(),
     original_title: z.string(),
-    alternative_titles: z.object({
-      titles: z.array(z.object({ iso_3166_1: z.string(), title: z.string() })),
-    }),
+    alternative_titles: z
+      .object({ titles: z.array(z.object({ iso_3166_1: z.string(), title: z.string() })) })
+      .optional()
+      .default({ titles: [] }),
 
     overview: z.string(),
     tagline: z.string(),
@@ -47,13 +48,16 @@ export const MovieDetailsSchema = z
     production_countries: z.array(z.object({ iso_3166_1: z.string() })),
     production_companies: TmdbProductionCompaniesSchema,
 
-    external_ids: z.object({
-      imdb_id: z.string().nullable(),
-      wikidata_id: z.string().nullable(),
-      facebook_id: z.string().nullable(),
-      instagram_id: z.string().nullable(),
-      twitter_id: z.string().nullable(),
-    }),
+    external_ids: z
+      .object({
+        imdb_id: z.string().nullable(),
+        wikidata_id: z.string().nullable(),
+        facebook_id: z.string().nullable(),
+        instagram_id: z.string().nullable(),
+        twitter_id: z.string().nullable(),
+      })
+      .optional()
+      .default({ imdb_id: null, wikidata_id: null, facebook_id: null, instagram_id: null, twitter_id: null }),
 
     videos: z.object({ results: TmdbVideosSchema }).optional().default({ results: [] }),
 
@@ -66,20 +70,23 @@ export const MovieDetailsSchema = z
       .optional()
       .default({ backdrops: [], logos: [], posters: [] }),
 
-    translations: z.object({
-      translations: z.array(
-        z.object({
-          iso_639_1: z.string(),
-          data: z.object({
-            homepage: z.string().nullable(),
-            overview: z.string().nullable(),
-            runtime: z.number().nullable(),
-            tagline: z.string().nullable(),
-            title: z.string().nullable(),
+    translations: z
+      .object({
+        translations: z.array(
+          z.object({
+            iso_639_1: z.string(),
+            data: z.object({
+              homepage: z.string().nullable(),
+              overview: z.string().nullable(),
+              runtime: z.number().nullable(),
+              tagline: z.string().nullable(),
+              title: z.string().nullable(),
+            }),
           }),
-        }),
-      ),
-    }),
+        ),
+      })
+      .optional()
+      .default({ translations: [] }),
 
     release_dates: z
       .object({

@@ -18,17 +18,25 @@ if (process.argv.length === 2) {
 
 program.parse();
 
-// const person = await getPersonDetails('525');
-// Bun.write('person.json', JSON.stringify(person, null, 2));
+/*
+const facet = createSearchMovieViewFacet({ movieDir: '/home/devtobias/data/flipsen/movies' });
+const res = await facet.generateItem('950396');
+// console.log(res);
 
-// const collection = await getCollectionDetails('10');
-// Bun.write('collection.json', JSON.stringify(collection, null, 2));
+if (!res.data) throw new Error('No data');
 
-// const movie = await getMovieDetails('693134');
-// Bun.write('movie.json', JSON.stringify(movie, null, 2));
+const client = new MongoClient('mongodb://localhost:27017', {
+  auth: { username: 'root', password: 'root' },
+});
 
-// const tv = await getCompleteTvDetails('1399');
-// Bun.write('tv.json', JSON.stringify(tv, null, 2));
+client.on('commandStarted', (started) => console.log(started));
+const collection = client.db('flipsen').collection('movies');
 
-// const company = await getCompanyDetails('420');
-// Bun.write('company.json', JSON.stringify(company, null, 2));
+const _id = new ObjectId();
+await collection.insertOne({ _id, ...res.data });
+
+const state = facet.generateState(_id.toString(), res.data);
+console.log(state);
+
+await client.close();
+*/
