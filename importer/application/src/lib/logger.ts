@@ -11,6 +11,8 @@ export const logger = {
     }
 
     console.log(red(`ERROR: ${msg}`) + (payload ? '\n' + JSON.stringify(payload, null, 2) : ''));
+
+    return undefined;
   },
   info: (msg: string, payload?: object) => {
     if (config.shouldLogToLogtail) {
@@ -19,6 +21,8 @@ export const logger = {
     }
 
     console.log(green(`INFO: ${msg}`) + (payload ? '\n' + JSON.stringify(payload, null, 2) : ''));
+
+    return undefined;
   },
   debug: (msg: string, payload?: object) => {
     if (config.shouldLogToLogtail) {
@@ -27,5 +31,7 @@ export const logger = {
     }
 
     console.log(gray(`DEBUG: ${msg}`) + (payload ? '\n' + JSON.stringify(payload, null, 2) : ''));
+
+    return undefined;
   },
 };

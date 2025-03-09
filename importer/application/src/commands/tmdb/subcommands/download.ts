@@ -14,7 +14,10 @@ import { logger } from '$/lib/logger';
 export const downloadCommand = new Command()
   .command('download')
   .description('Download all movies from given ids as json files to the output directory.')
-  .argument('<movies | tvs | collections | persons | companies>', 'Type of data to download from the api')
+  .argument(
+    '<movie | tv | collection | person | production_company>',
+    'Type of data to download from the api',
+  )
   .requiredOption('--input-file, -i <string>', 'Input file with movie ids')
   .option('--out-dir, -o <string>', 'Output directory', '.')
   .option('--concurrency, -c <number>', 'Number of concurrent requests', '40')
@@ -22,7 +25,7 @@ export const downloadCommand = new Command()
   .option('--overwrite -f <boolean>', 'Overwrite existing files', false)
   .action(
     async (
-      type: 'collections' | 'companies' | 'movies' | 'persons' | 'tvs',
+      type: 'collection' | 'movie' | 'person' | 'production_company' | 'tv',
       options: {
         concurrency: string;
         errorDir: string;
@@ -62,7 +65,7 @@ export const downloadCommand = new Command()
 
         queue.add(async () => {
           const downloadFunction = async () => {
-            if (type === 'movies') {
+            if (type === 'movie') {
               const { data, status } = await getMovieDetails(id);
 
               if (status === 404) missingIds.push(id);
@@ -71,7 +74,7 @@ export const downloadCommand = new Command()
               return { data, isMissing: status === 404 };
             }
 
-            if (type === 'tvs') {
+            if (type === 'tv') {
               const { data, errors } = await getCompleteTvDetails(id);
 
               const has404 = errors?.some((err) => err?.status === 404);
@@ -82,7 +85,7 @@ export const downloadCommand = new Command()
               return { data, isMissing: has404 };
             }
 
-            if (type === 'collections') {
+            if (type === 'collection') {
               const { data, status } = await getCollectionDetails(id);
 
               if (status === 404) missingIds.push(id);
@@ -91,7 +94,7 @@ export const downloadCommand = new Command()
               return { data, isMissing: status === 404 };
             }
 
-            if (type === 'persons') {
+            if (type === 'person') {
               const { data, status } = await getPersonDetails(id);
 
               if (status === 404) missingIds.push(id);
@@ -100,7 +103,7 @@ export const downloadCommand = new Command()
               return { data, isMissing: status === 404 };
             }
 
-            if (type === 'companies') {
+            if (type === 'production_company') {
               const { data, status } = await getCompanyDetails(id);
 
               if (status === 404) missingIds.push(id);

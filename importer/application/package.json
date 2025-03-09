@@ -11,6 +11,7 @@
     "axios": "^1.8.1",
     "axios-rate-limit": "^1.4.0",
     "commander": "^13.1.0",
+    "mongodb": "^6.14.2",
     "openai": "^4.86.1",
     "p-queue": "^8.1.0",
     "picocolors": "^1.1.1",

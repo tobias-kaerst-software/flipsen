@@ -16,4 +16,5 @@ export const config = {
   tmdbProxyUrls: ['https://api.themoviedb.org/3'],
   logtailFlushDebounceTime: 1000,
   shouldLogToLogtail: false,
+  openAiBatchSize: 20_000,
 };
